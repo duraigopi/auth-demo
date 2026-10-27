@@ -48,8 +48,8 @@ Adopted from the flash_css repo. Server-side rules there (Hono, AWS, Cognito, sh
 ## Zod and validation
 
 - Import Zod from `zod/v4` (`import { z } from "zod/v4"`).
-- Use `code: "custom"` in `ctx.addIssue`, with each property on its own line.
-- Required enum fields that default to `""`: `.or(z.literal("")).superRefine(...)`.
+- `superRefine` is deprecated in `zod/v4`. Use `.refine()` for a single check, with `message` and `path` on their own lines, or `.check()` for several issues.
+- Required enum fields that default to `""`: `.or(z.literal("")).refine(...)` with a "Please select ..." message.
 - Every string field needs a `max()` length. Free-text fields must reject `<` and `>`.
 - Required-field messages: `"Please select the company type"`. Format errors: `"Please enter a valid email address"`. Business-rule errors may be plain statements.
 - Use lowercase field names inside messages.
