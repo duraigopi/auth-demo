@@ -1,5 +1,5 @@
 /* Library imports */
-import { createSystem, defaultConfig, defineConfig, defineRecipe } from "@chakra-ui/react";
+import { createSystem, defaultConfig, defineConfig, defineRecipe, defineSlotRecipe } from "@chakra-ui/react";
 
 /* Adds the `primary` variant to Chakra's default button recipe */
 const buttonRecipe = defineRecipe({
@@ -18,10 +18,30 @@ const buttonRecipe = defineRecipe({
   },
 });
 
+/* Chakra blocks selecting label text, and browsers show an arrow cursor over labels */
+const fieldRecipe = defineSlotRecipe({
+  slots: ["root", "label", "input", "textarea", "errorText", "helperText", "select", "requiredIndicator"],
+  base: {
+    label: {
+      userSelect: "text",
+      cursor: "text",
+    },
+  },
+});
+
 const config = defineConfig({
+  globalCss: {
+    "::selection": {
+      bg: "#0067D8",
+      color: "#FFFFFF",
+    },
+  },
   theme: {
     recipes: {
       button: buttonRecipe,
+    },
+    slotRecipes: {
+      field: fieldRecipe,
     },
   },
 });
