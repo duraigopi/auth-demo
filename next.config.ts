@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
-    agentFeedback: true,
+    optimizePackageImports: ["@chakra-ui/react", "usehooks-ts"],
   },
   cacheComponents: true,
   partialPrefetching: true,
