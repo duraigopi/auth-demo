@@ -2,7 +2,8 @@
 
 /* Library imports */
 import { forwardRef } from "react";
-import { Input } from "@chakra-ui/react";
+import type { ReactNode } from "react";
+import { Input, InputGroup } from "@chakra-ui/react";
 import type { InputProps } from "@chakra-ui/react";
 
 /* Lib module imports */
@@ -13,10 +14,11 @@ export interface InputFieldProps extends InputProps {
   label?: string;
   errorMessage?: string;
   helperText?: string;
+  leftIcon?: ReactNode;
 }
 
 export const TextField = forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ label, errorMessage, helperText, required, disabled, ...inputProps }, ref) => (
+  ({ label, errorMessage, helperText, leftIcon, required, disabled, ...inputProps }, ref) => (
     <Field
       label={label}
       errorText={errorMessage}
@@ -25,7 +27,9 @@ export const TextField = forwardRef<HTMLInputElement, InputFieldProps>(
       required={required}
       disabled={disabled}
     >
-      <Input ref={ref} {...inputProps} />
+      <InputGroup startElement={leftIcon}>
+        <Input ref={ref} {...inputProps} />
+      </InputGroup>
     </Field>
   ),
 );

@@ -6,6 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Link, Stack, Text } from "@chakra-ui/react";
+import { LuLock, LuMail } from "react-icons/lu";
 
 /* Shared module imports */
 import { PasswordField } from "@shared/components/password-field";
@@ -50,6 +51,7 @@ export const LoginForm = () => {
               label="Email"
               type="email"
               placeholder="Enter your email address"
+              leftIcon={<LuMail />}
               errorMessage={fieldState.error?.message}
             />
           )}
@@ -63,12 +65,15 @@ export const LoginForm = () => {
               {...field}
               label="Password"
               placeholder="Enter your password"
+              leftIcon={<LuLock />}
               errorMessage={fieldState.error?.message}
             />
           )}
         />
 
-        <Button type="submit">Log in</Button>
+        <Button type="submit" variant="primary" size="lg">
+          Log in
+        </Button>
 
         <Text textAlign="center" fontSize="sm">
           Don&apos;t have an account?{" "}

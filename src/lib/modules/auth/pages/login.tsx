@@ -3,7 +3,7 @@ import { AuthLayout } from "@auth/components/layout";
 import { LoginForm } from "@auth/forms/login";
 
 export const LoginPage = () => (
-  <AuthLayout title="Login" subtitle="Welcome back. Please log in to continue.">
+  <AuthLayout title="Welcome back" subtitle="Log in to access your dashboard">
     <LoginForm />
   </AuthLayout>
 );

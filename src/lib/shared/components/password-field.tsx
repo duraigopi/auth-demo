@@ -9,7 +9,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import type { InputFieldProps } from "@shared/components/text-field";
 
 export const PasswordField = forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ label, errorMessage, helperText, required, disabled, ...inputProps }, ref) => (
+  ({ label, errorMessage, helperText, leftIcon, required, disabled, ...inputProps }, ref) => (
     <Field
       label={label}
       errorText={errorMessage}
@@ -18,7 +18,7 @@ export const PasswordField = forwardRef<HTMLInputElement, InputFieldProps>(
       required={required}
       disabled={disabled}
     >
-      <PasswordInput ref={ref} {...inputProps} />
+      <PasswordInput ref={ref} rootProps={{ startElement: leftIcon }} {...inputProps} />
     </Field>
   ),
 );

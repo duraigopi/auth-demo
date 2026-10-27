@@ -6,6 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Link, Stack, Text } from "@chakra-ui/react";
+import { LuLock, LuMail, LuUser } from "react-icons/lu";
 
 /* Shared module imports */
 import { PasswordField } from "@shared/components/password-field";
@@ -52,6 +53,7 @@ export const SignupForm = () => {
               label="Full name"
               placeholder="Enter your full name"
               autoComplete="name"
+              leftIcon={<LuUser />}
               errorMessage={fieldState.error?.message}
             />
           )}
@@ -67,6 +69,7 @@ export const SignupForm = () => {
               type="email"
               placeholder="Enter your email address"
               autoComplete="email"
+              leftIcon={<LuMail />}
               errorMessage={fieldState.error?.message}
             />
           )}
@@ -81,6 +84,7 @@ export const SignupForm = () => {
               label="Password"
               placeholder="Enter your password"
               autoComplete="new-password"
+              leftIcon={<LuLock />}
               errorMessage={fieldState.error?.message}
             />
           )}
@@ -95,12 +99,15 @@ export const SignupForm = () => {
               label="Confirm password"
               placeholder="Enter your password again"
               autoComplete="new-password"
+              leftIcon={<LuLock />}
               errorMessage={fieldState.error?.message}
             />
           )}
         />
 
-        <Button type="submit">Sign up</Button>
+        <Button type="submit" variant="primary" size="lg">
+          Sign up
+        </Button>
 
         <Text textAlign="center" fontSize="sm">
           Already have an account?{" "}

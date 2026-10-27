@@ -2,7 +2,7 @@
 
 import type {
   ButtonProps,
-  GroupProps,
+  InputGroupProps,
   InputProps,
   StackProps,
 } from "@chakra-ui/react"
@@ -40,7 +40,7 @@ export interface PasswordVisibilityProps {
 
 export interface PasswordInputProps
   extends InputProps, PasswordVisibilityProps {
-  rootProps?: GroupProps
+  rootProps?: Omit<InputGroupProps, "children">
 }
 
 export const PasswordInput = React.forwardRef<
