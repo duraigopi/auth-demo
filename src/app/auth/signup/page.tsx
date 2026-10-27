@@ -1,5 +1,5 @@
-/* Auth module imports */
-import { SignupPage } from "@auth/pages/signup";
+/* Lib module imports */
+import { SignupPage } from "@lib/pages/signup";
 
 const Signup = () => <SignupPage />;
 

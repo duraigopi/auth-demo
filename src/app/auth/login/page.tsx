@@ -1,5 +1,5 @@
 /* Lib module imports */
-import { LoginPage } from "@auth/pages/login";
+import { LoginPage } from "@lib/pages/login";
 
 const Login = () => <LoginPage />;
 

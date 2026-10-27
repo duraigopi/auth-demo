@@ -27,8 +27,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@shared/*": ["./src/lib/shared/*"],
-      "@auth/*": ["./src/lib/modules/auth/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@lib/*": ["./src/lib/*"]
     }
   },
   "include": [

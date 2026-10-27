@@ -25,7 +25,7 @@ Adopted from the flash_css repo. Server-side rules there (Hono, AWS, Cognito, sh
 ## Imports
 
 - Use absolute path aliases (`@/...`), not relative paths like `../x`. Barrel `index.ts` files may use relative exports.
-- Group imports with single-line comments, in this order: `/* Library imports */` (external packages), then `/* Lib module imports */` (`@/*`), then `/* Shared module imports */` (`@shared/*`), then one group per feature module such as `/* Auth module imports */` (`@auth/*`).
+- Group imports with single-line comments, in this order: `/* Library imports */` (external packages), then `/* Lib module imports */` (`@/*`, `@lib/*`), then `/* Shared module imports */` (`@shared/*`).
 - Write destructured imports on one line unless the line passes 120 characters.
 
 ## Code style

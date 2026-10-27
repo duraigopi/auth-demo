@@ -8,15 +8,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Link, Stack, Text } from "@chakra-ui/react";
 import { LuLock, LuMail, LuUser } from "react-icons/lu";
 
+/* Lib module imports */
+import { signupSchema } from "@lib/schema/auth";
+import type { SignupFormData } from "@lib/types/auth";
+
 /* Shared module imports */
 import { PasswordField } from "@shared/components/password-field";
 import { TextField } from "@shared/components/text-field";
 import { getErrorMessages } from "@shared/utils/form";
 import { showSuccessToast } from "@shared/utils/notifications";
-
-/* Auth module imports */
-import { signupSchema } from "@auth/schema/auth";
-import type { SignupFormData } from "@auth/types/auth";
 
 export const SignupForm = () => {
   const { control, handleSubmit } = useForm<SignupFormData>({
