@@ -2,8 +2,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-/* Lib module imports */
-import { Providers } from "@/components/providers";
+/* Shared module imports */
+import { Providers } from "@shared/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
