@@ -3,7 +3,7 @@ import { Hono } from "hono";
 
 /* Backend module imports */
 import { authMiddleware } from "@backend/middleware/auth";
-import { loginSchema, refreshSchema, signupSchema } from "@backend/schemas/auth";
+import { loginSchema, signupSchema } from "@backend/schemas/auth";
 import { zValidatorWrapper } from "@backend/utils/schema-validator";
 
 /* Handler imports */
@@ -20,8 +20,8 @@ authRoutes.post("/signup", zValidatorWrapper("json", signupSchema), signup);
 /* POST /login: check credentials and start a session (public) */
 authRoutes.post("/login", zValidatorWrapper("json", loginSchema), login);
 
-/* POST /refresh: exchange a refresh token for new tokens (public, the access token has usually expired) */
-authRoutes.post("/refresh", zValidatorWrapper("json", refreshSchema), refresh);
+/* POST /refresh: exchange the refresh token (sent in the Authorization header) for new tokens, public because the access token has usually expired */
+authRoutes.post("/refresh", refresh);
 
 /* POST /logout: revoke the current session */
 authRoutes.post("/logout", authMiddleware, logout);

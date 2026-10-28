@@ -14,10 +14,10 @@ export const get = async (c: Context<AuthEnv>) => {
 
   try {
     const { data: user } = await UserEntity
-    .get({ user_id: userId })
-    .go({
+      .get({ user_id: userId })
+      .go({
         attributes: ["user_id", "email", "name", "role", "is_active"],
-    });
+      });
     if (!user) {
       const response = formatErrorResponse({
         message: "The user was not found.",

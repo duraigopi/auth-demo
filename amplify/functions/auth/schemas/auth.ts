@@ -20,6 +20,7 @@ export const loginSchema = z.object({
 
 export const nameField = z
   .string()
+  .trim()
   .min(1, "Please enter your full name")
   .max(100, "Please enter a name less than 100 characters");
 
@@ -37,13 +38,6 @@ export const signupSchema = z.object({
   name: nameField,
   email: emailField,
   password: passwordField,
-});
-
-export const refreshSchema = z.object({
-  token: z
-    .string()
-    .min(1, "Please provide the refresh token")
-    .max(1000, "Please provide a valid refresh token"),
 });
 
 export const updateProfileSchema = z.object({

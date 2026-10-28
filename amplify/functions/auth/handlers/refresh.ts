@@ -1,4 +1,5 @@
 /* Library imports */
+import type { Context } from "hono";
 import { nanoid } from "nanoid";
 
 /* Backend module imports */
@@ -10,11 +11,11 @@ import { logError } from "@backend/utils/logger";
 import { getUnixTimestamp } from "@backend/utils/time-calculations";
 import { createAccessToken, createRefreshToken, verifyRefreshToken } from "@backend/utils/token";
 import { toPublicUser } from "@backend/utils/user";
-import type { ValidatedJsonContext } from "@backend/types/api";
-import type { RefreshFormData } from "@backend/types/auth";
 
-export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
-  const { token } = c.req.valid("json");
+export const refresh = async (c: Context) => {
+  /* The refresh token is sent in the Authorization header, like every other token */
+  const authorization = c.req.header("Authorization");
+  const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : undefined;
 
   const sessionEnded = () => {
     const response = formatErrorResponse({
@@ -25,6 +26,8 @@ export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
   };
 
   try {
+    if (!token) return sessionEnded();
+
     /* Check the signature and that this is a refresh token */
     const payload = await verifyRefreshToken(token);
     if (!payload) return sessionEnded();
@@ -65,7 +68,16 @@ export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
         .set({ refresh_token: tokenId })
         .where(({ refresh_token }, { eq }) => eq(refresh_token, session.refresh_token))
         .go();
-    } catch {
+    } catch (error) {
+      /* If the stored token id is unchanged, the update failed for another reason, which is not a reuse */
+      const { data: latest } = await SessionEntity
+        .get({ session_id: session.session_id })
+        .go({
+          consistent: true,
+          attributes: ["refresh_token"],
+        });
+      if (latest?.refresh_token === session.refresh_token) throw error;
+
       /* The token was already used, which could mean it was copied, so end the session */
       await SessionEntity
         .patch({ session_id: session.session_id })

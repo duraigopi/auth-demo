@@ -105,7 +105,14 @@ app.notFound((c) => {
 
 /* Last-resort handler: any error that wasn't handled in a route ends up here */
 app.onError((err, c) => {
-  if (err instanceof HTTPException) return err.getResponse();
+  /* HTTPException (for example a malformed JSON body) keeps its status but uses the standard body */
+  if (err instanceof HTTPException) {
+    const response = formatErrorResponse({
+      message: err.message,
+      error: err.status < 500 ? ERROR_CODES.BAD_REQUEST : ERROR_CODES.INTERNAL_SERVER_ERROR,
+    });
+    return c.json(response, err.status);
+  }
 
   const errorMessage = err instanceof Error ? err.message : ERROR_MESSAGES.INTERNAL_SERVER_ERROR;
   logError({

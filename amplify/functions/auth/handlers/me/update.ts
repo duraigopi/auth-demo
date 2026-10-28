@@ -11,16 +11,9 @@ export const update = async (c: AuthValidatedContext<{ json: UpdateProfileFormDa
   const { name } = c.req.valid("json");
 
   try {
-    const { data: user } = await UserEntity.get({ user_id: userId }).go();
-    if (!user) {
-      const response = formatErrorResponse({
-        message: "The user was not found.",
-        error: ERROR_CODES.USER_NOT_FOUND,
-      });
-      return c.json(response, 404);
-    }
-
-    await UserEntity.patch({ user_id: userId })
+    /* authMiddleware already confirmed the user exists, so no read is needed first */
+    await UserEntity
+      .patch({ user_id: userId })
       .set({ name })
       .go();
 

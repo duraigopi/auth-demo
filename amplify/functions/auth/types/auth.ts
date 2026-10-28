@@ -5,7 +5,7 @@ import type { z } from "zod/v4";
 /* Backend module imports */
 import type { USER_ROLE } from "@backend/constants/auth";
 import type { UserEntity } from "@backend/entities/user";
-import type { changePasswordSchema, loginSchema, refreshSchema, signupSchema, updateProfileSchema } from "@backend/schemas/auth";
+import type { changePasswordSchema, loginSchema, signupSchema, updateProfileSchema } from "@backend/schemas/auth";
 import type { listQuerySchema } from "@backend/schemas/query";
 import type { createUserSchema, updateUserSchema, userIdParamSchema, userListQuerySchema } from "@backend/schemas/user";
 
@@ -20,9 +20,6 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 
 /* Body of POST /auth/signup */
 export type SignupFormData = z.infer<typeof signupSchema>;
-
-/* Body of POST /auth/refresh */
-export type RefreshFormData = z.infer<typeof refreshSchema>;
 
 /* Caller details taken from the access token, available as c.var.auth */
 export interface AuthContext {
