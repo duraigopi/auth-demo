@@ -2,6 +2,7 @@
 
 /* Library imports */
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import type { FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,16 +10,19 @@ import { Button, Link, Stack, Text } from "@chakra-ui/react";
 import { LuLock, LuMail } from "react-icons/lu";
 
 /* Lib module imports */
+import { loginApi } from "@lib/api/auth";
 import { loginSchema } from "@lib/schema/auth";
-import type { LoginFormData } from "@lib/types/auth";
+import type { LoginFormData, LoginResponseData } from "@lib/types/auth";
 
 /* Shared module imports */
 import { PasswordField } from "@shared/components/password-field";
 import { TextField } from "@shared/components/text-field";
+import { useApiMutation } from "@shared/hooks/use-api-query";
 import { getErrorMessages } from "@shared/utils/form";
-import { showSuccessToast } from "@shared/utils/notifications";
+import { saveTokens } from "@shared/utils/token-storage";
 
 export const LoginForm = () => {
+  const router = useRouter();
   const { control, handleSubmit } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -27,13 +31,18 @@ export const LoginForm = () => {
     },
   });
 
-  /* No login API yet, so this only confirms the form is valid */
-  const onSubmit = (data: LoginFormData) => {
-    showSuccessToast({
-      title: "Login Form Submitted",
-      description: `Validation passed for ${data.email}. Connect the login API to continue.`,
-    });
-  };
+  const { mutate: login, isLoading } = useApiMutation<LoginResponseData, LoginFormData>({
+    mutationFn: loginApi,
+    successTitle: "Logged In Successfully",
+    successDescription: "Welcome back.",
+    errorTitle: "Login Failed",
+    onSuccess: ({ accessToken, refreshToken }) => {
+      saveTokens({ accessToken, refreshToken });
+      router.push("/");
+    },
+  });
+
+  const onSubmit = (data: LoginFormData) => login(data);
 
   const onError = (errors: FieldErrors<LoginFormData>) => {
     console.error("[Auth] Login validation failed:", getErrorMessages(errors));
@@ -71,7 +80,7 @@ export const LoginForm = () => {
           )}
         />
 
-        <Button type="submit" variant="primary" size="lg">
+        <Button type="submit" variant="primary" size="lg" loading={isLoading}>
           Log in
         </Button>
 

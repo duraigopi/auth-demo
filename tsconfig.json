@@ -28,7 +28,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@shared/*": ["./src/shared/*"],
-      "@lib/*": ["./src/lib/*"]
+      "@lib/*": ["./src/lib/*"],
+      "@amplifyOutputs": ["./amplify_outputs.json"]
     }
   },
   "include": [

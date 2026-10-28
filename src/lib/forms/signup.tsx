@@ -2,6 +2,7 @@
 
 /* Library imports */
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import type { FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,16 +10,18 @@ import { Button, Link, Stack, Text } from "@chakra-ui/react";
 import { LuLock, LuMail, LuUser } from "react-icons/lu";
 
 /* Lib module imports */
+import { signupApi } from "@lib/api/auth";
 import { signupSchema } from "@lib/schema/auth";
-import type { SignupFormData } from "@lib/types/auth";
+import type { PublicUser, SignupFormData, SignupRequestBody } from "@lib/types/auth";
 
 /* Shared module imports */
 import { PasswordField } from "@shared/components/password-field";
 import { TextField } from "@shared/components/text-field";
+import { useApiMutation } from "@shared/hooks/use-api-query";
 import { getErrorMessages } from "@shared/utils/form";
-import { showSuccessToast } from "@shared/utils/notifications";
 
 export const SignupForm = () => {
+  const router = useRouter();
   const { control, handleSubmit } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -29,13 +32,16 @@ export const SignupForm = () => {
     },
   });
 
-  /* No signup API yet, so this only confirms the form is valid */
-  const onSubmit = (data: SignupFormData) => {
-    showSuccessToast({
-      title: "Signup Form Submitted",
-      description: `Validation passed for ${data.email}. Connect the signup API to continue.`,
-    });
-  };
+  const { mutate: signup, isLoading } = useApiMutation<PublicUser, SignupRequestBody>({
+    mutationFn: signupApi,
+    successTitle: "Account Created Successfully",
+    successDescription: "You can log in now.",
+    errorTitle: "Signup Failed",
+    onSuccess: () => router.push("/auth/login"),
+  });
+
+  /* The confirm-password field is only for the form, so it isn't sent */
+  const onSubmit = ({ name, email, password }: SignupFormData) => signup({ name, email, password });
 
   const onError = (errors: FieldErrors<SignupFormData>) => {
     console.error("[Auth] Signup validation failed:", getErrorMessages(errors));
@@ -105,7 +111,7 @@ export const SignupForm = () => {
           )}
         />
 
-        <Button type="submit" variant="primary" size="lg">
+        <Button type="submit" variant="primary" size="lg" loading={isLoading}>
           Sign up
         </Button>
 

@@ -92,6 +92,11 @@ loginAttemptsTable.grantReadWriteData(backend.authFunction.resources.lambda);
 new CfnOutput(apiStack, "AuthApiUrl", { value: httpApi.apiEndpoint });
 backend.addOutput({
   custom: {
-    apiUrl: httpApi.apiEndpoint,
+    API: {
+      api: {
+        endpoint: httpApi.apiEndpoint,
+        region: apiStack.region,
+      },
+    },
   },
 });

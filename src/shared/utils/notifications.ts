@@ -1,6 +1,9 @@
 /* Library imports */
 import { toaster } from "@/components/ui/toaster";
 
+/* Shared module imports */
+import type { ApiResponse } from "@shared/types/api";
+
 /* Toast content, with the type decided by the helper that is called */
 interface ToastConfig {
   title: string;
@@ -28,3 +31,20 @@ export const showErrorToast = (config: ToastConfig) =>
 export const showWarningToast = (config: ToastConfig) => createToast("warning", config);
 
 export const showInfoToast = (config: ToastConfig) => createToast("info", config);
+
+/* Shows a failed API response: the first validation error if there is one, otherwise the server's message */
+export const showApiErrorToast = (response: ApiResponse<unknown>, defaultTitle = "Operation Failed") => {
+  const [firstError] = response.validation_errors ?? [];
+  if (firstError) {
+    showErrorToast({
+      title: response.message || "Validation Error",
+      description: firstError.message,
+    });
+    return;
+  }
+
+  showErrorToast({
+    title: defaultTitle,
+    description: response.message || "Something went wrong. Please try again.",
+  });
+};

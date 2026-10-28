@@ -35,13 +35,13 @@ const eslintConfig = defineConfig([
       /* Type-only imports carry the `type` keyword so the bundler can drop them */
       "@typescript-eslint/consistent-type-imports": "error",
 
-      /* Env vars are read and validated once in src/env.ts; NODE_ENV is set by the toolchain */
+      /* Config comes from amplify_outputs.json, not process.env; NODE_ENV is set by the toolchain */
       "no-restricted-syntax": [
         "error",
         {
           selector:
             "MemberExpression[object.object.name='process'][object.property.name='env'][property.name!='NODE_ENV']",
-          message: "Import the validated value from @/env instead of reading process.env directly.",
+          message: "Read config from the Amplify outputs file instead of process.env.",
         },
       ],
 
