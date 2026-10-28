@@ -6,7 +6,6 @@ import { logError } from "@backend/utils/logger";
 import type { AuthValidatedContext } from "@backend/types/api";
 import type { UserIdParam } from "@backend/types/auth";
 
-/* Lets a disabled user sign in again */
 export const enable = async (c: AuthValidatedContext<{ param: UserIdParam }>) => {
   const { userId } = c.req.valid("param");
 

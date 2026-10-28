@@ -4,13 +4,13 @@ import type { Context, Env } from "hono";
 /* Backend module imports */
 import type { AuthContext } from "@backend/types/auth";
 
-/* One failed field in a rejected request body */
+/* One failed field in a rejected request, returned in validation_errors */
 export interface PayloadValidationError {
-  field: string;   /* Dotted field path, for example "email" */
-  message: string; /* User-facing validation message */
+  field: string;
+  message: string;
 }
 
-/* Page position returned by list endpoints; total_pages is at least 1 so an empty list still shows one page */
+/* Page info returned by list endpoints */
 export interface PaginationMeta {
   page: number;
   limit: number;
@@ -18,7 +18,7 @@ export interface PaginationMeta {
   total_pages: number;
 }
 
-/* Standard body returned by every endpoint */
+/* Response body used by every endpoint, built by formatSuccessResponse and formatErrorResponse */
 export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
@@ -30,15 +30,15 @@ export interface ApiResponse<T = unknown> {
   timestamp: string;
 }
 
-/* Hono context after zValidatorWrapper has accepted the body, which types c.req.valid("json") */
+/* Handler context after the JSON body is validated, used by the public handlers (signup, login, refresh) */
 export type ValidatedJsonContext<T> = Context<Env, string, { out: { json: T } }>;
 
-/* Hono environment for routes behind the auth middleware */
+/* Hono env for routes behind authMiddleware, it gives handlers c.var.auth */
 export interface AuthEnv extends Env {
   Variables: {
     auth: AuthContext;
   };
 }
 
-/* Context for a handler behind the auth middleware; Out lists the validated parts, for example { param: UserIdParam; json: UpdateUserFormData } */
+/* Handler context behind authMiddleware plus the validated request parts, e.g. AuthValidatedContext<{ param: UserIdParam }> */
 export type AuthValidatedContext<Out extends object> = Context<AuthEnv, string, { out: Out }>;

@@ -15,7 +15,6 @@ export const userIdParamSchema = z.object({
     .max(50, "Please provide a valid user id"),
 });
 
-/* The admin chooses the role and the first password, which the user can change later */
 export const createUserSchema = z.object({
   name: nameField,
   email: emailField,
@@ -23,7 +22,7 @@ export const createUserSchema = z.object({
   role: roleField,
 });
 
-/* Email and password are left out on purpose, so an edit cannot change how a user signs in; enabling and disabling have their own routes */
+/* Email, password and active status can't be edited here */
 export const updateUserSchema = createUserSchema
   .pick({ name: true, role: true })
   .partial()
@@ -32,7 +31,6 @@ export const updateUserSchema = createUserSchema
     path: ["name"],
   });
 
-/* GET /users, the shared pagination and search fields plus the role and active filters */
 export const userListQuerySchema = listQuerySchema.extend({
   role: roleField.optional(),
   is_active: z.enum(["true", "false"], { error: "Please provide true or false" }).transform((value) => value === "true").optional(),

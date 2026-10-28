@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    /* No DOM here, so browser globals fail at compile time instead of in Lambda */
     "lib": ["ES2022"],
-    /* node for synth-time code, aws-lambda for the handler event shapes */
     "types": ["node", "aws-lambda"],
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -19,7 +17,6 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "skipLibCheck": true,
-    /* Resolved by the bundler, so they work in handler code but not in the synth-time files backend.ts loads */
     "paths": {
       "@backend/*": ["./functions/auth/*"]
     }

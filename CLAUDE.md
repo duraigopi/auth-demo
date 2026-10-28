@@ -17,15 +17,22 @@ Adopted from the flash_css repo. Server-side rules there (Hono, AWS, Cognito, sh
 ## Comment style
 
 - Use `/* */` for every comment, never `//` (for example `/* 5 minutes */`).
-- Every comment is a single short line. Explain WHY only, never WHAT. Default to no comment in new code.
-- Section labels above groups are fine (`/* Identification */`). No banner headers.
-- Every `export type` / `export interface` gets a single-line comment above it. Property comments go on the same line as the property, aligned.
+- Every comment is one short, plain line, written the way a developer would say it. No long explanations.
+- Explain why, not what. Comment decisions, security reasons and non-obvious steps. Never restate the code.
+- Add a one-line comment above each of these:
+  - a route: method, path and purpose (`/* POST /signup: create a client account (public) */`)
+  - an exported type or interface: its purpose and where it is used
+  - a util function: what it returns or does
+  - a middleware in the entry file: what it guards or adds
+  - a key attribute in a data model: partition key, or the key of an index
+- Inside handlers, comment only the important steps (security checks, concurrency, token rotation, lockouts), about six per file at most. No comments between routine lines.
+- Section labels above groups are fine. No banner headers. Keep the import group labels (see Imports).
 - Do not strip useful existing comments during refactors.
 
 ## Imports
 
 - Use absolute path aliases (`@/...`), not relative paths like `../x`. Barrel `index.ts` files may use relative exports.
-- Group imports with single-line comments, in this order: `/* Library imports */` (external packages), then `/* Lib module imports */` (`@/*`, `@lib/*`), then `/* Shared module imports */` (`@shared/*`).
+- Group imports with a one-line label comment per group, separated by a blank line, in this order: external packages (`/* Library imports */`), then `@/*` and `@lib/*`, then `@shared/*`. In the backend the groups are `/* Library imports */`, `/* Backend module imports */`, `/* Handler imports */` and `/* Route imports */`.
 - Write destructured imports on one line unless the line passes 120 characters.
 
 ## Code style

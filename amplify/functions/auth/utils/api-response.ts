@@ -2,7 +2,7 @@
 import { getISOString } from "@backend/utils/time-calculations";
 import type { ApiResponse, PaginationMeta, PayloadValidationError } from "@backend/types/api";
 
-/* Create standardized success response with optional data, count and pagination */
+/* Builds the body for a successful response */
 export const formatSuccessResponse = <T = unknown>({ message, data, count, pagination }: {
   message: string;
   data?: T;
@@ -21,7 +21,7 @@ export const formatSuccessResponse = <T = unknown>({ message, data, count, pagin
   return response;
 };
 
-/* Create standardized error response with optional validation errors */
+/* Builds the body for an error response */
 export const formatErrorResponse = ({ message, error, validation_errors }: {
   message: string;
   error: string;

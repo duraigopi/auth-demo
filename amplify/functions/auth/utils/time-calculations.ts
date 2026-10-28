@@ -1,22 +1,20 @@
-/* Time utilities, so callers never read the clock directly */
-
 /* Library imports */
 import { addDays, addMinutes, getUnixTime, isPast, parseISO } from "date-fns";
 
-/* Get current date as ISO string */
+/* Current time as an ISO string */
 export const getISOString = (): string => new Date().toISOString();
 
-/* Get current time as Unix seconds, the unit DynamoDB TTL expects */
+/* Current time in Unix seconds */
 export const getUnixTimestamp = (): number => getUnixTime(new Date());
 
-/* ISO string for a point in time some minutes from now */
+/* ISO string for a time some minutes from now */
 export const addMinutesToISOString = (minutes: number): string => addMinutes(new Date(), minutes).toISOString();
 
-/* Unix seconds for a point in time some days from now */
+/* Unix seconds for a time some days from now, used for TTL values */
 export const addDaysToUnixTimestamp = (days: number): number => getUnixTime(addDays(new Date(), days));
 
-/* True once an ISO timestamp is in the past */
+/* True when an ISO time is already in the past */
 export const isISOExpired = (iso: string): boolean => isPast(parseISO(iso));
 
-/* Unix seconds for a point in time some minutes from now, the unit JWT exp expects */
+/* Unix seconds for a time some minutes from now, used for the JWT exp claim */
 export const addMinutesToUnixTimestamp = (minutes: number): number => getUnixTime(addMinutes(new Date(), minutes));

@@ -5,50 +5,49 @@ import type { z } from "zod/v4";
 /* Backend module imports */
 import type { USER_ROLE } from "@backend/constants/auth";
 import type { UserEntity } from "@backend/entities/user";
-import type { loginSchema, refreshSchema, signupSchema } from "@backend/schemas/auth";
-import type { changePasswordSchema, updateProfileSchema } from "@backend/schemas/me";
+import type { changePasswordSchema, loginSchema, refreshSchema, signupSchema, updateProfileSchema } from "@backend/schemas/auth";
 import type { listQuerySchema } from "@backend/schemas/query";
 import type { createUserSchema, updateUserSchema, userIdParamSchema, userListQuerySchema } from "@backend/schemas/user";
 
-/* Role values a user can have */
+/* Role a user can have (ADMIN or CLIENT), stored on the user and in the access token */
 export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE];
 
-/* User fields that are safe to send to the browser, which leaves out the password hash */
+/* User fields that are safe to return to the client (no password hash), built by toPublicUser */
 export type PublicUser = Pick<EntityItem<typeof UserEntity>, "user_id" | "email" | "name" | "role" | "is_active">;
 
-/* Login request body, derived from the login schema */
+/* Body of POST /auth/login */
 export type LoginFormData = z.infer<typeof loginSchema>;
 
-/* Signup request body, derived from the signup schema */
+/* Body of POST /auth/signup */
 export type SignupFormData = z.infer<typeof signupSchema>;
 
-/* Refresh request body, derived from the refresh schema */
+/* Body of POST /auth/refresh */
 export type RefreshFormData = z.infer<typeof refreshSchema>;
 
-/* Who is calling, read from a verified access token */
+/* Caller details taken from the access token, available as c.var.auth */
 export interface AuthContext {
   userId: string;
   role: UserRole;
   sessionId: string;
 }
 
-/* Admin create-user request body, derived from the create-user schema */
+/* Body of POST /users, where an admin creates a user */
 export type CreateUserFormData = z.infer<typeof createUserSchema>;
 
-/* Admin edit-user request body, derived from the update-user schema */
+/* Body of PUT /users/:userId, where an admin edits a name or role */
 export type UpdateUserFormData = z.infer<typeof updateUserSchema>;
 
-/* Path parameters of the user routes, derived from the user-id schema */
+/* The :userId path param on the user routes */
 export type UserIdParam = z.infer<typeof userIdParamSchema>;
 
-/* Pagination and search params shared by every list endpoint */
+/* Pagination and search params shared by list endpoints */
 export type ListQueryParams = z.infer<typeof listQuerySchema>;
 
-/* Query params accepted by GET /users */
+/* Query params of GET /users */
 export type UserListQueryParams = z.infer<typeof userListQuerySchema>;
 
-/* Own-profile edit request body, derived from the update-profile schema */
+/* Body of PUT /me, where a user updates their own name */
 export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
 
-/* Change-password request body, derived from the change-password schema */
+/* Body of PUT /me/password */
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;

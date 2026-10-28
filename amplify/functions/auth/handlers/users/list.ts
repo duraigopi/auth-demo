@@ -11,7 +11,7 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
   const { page, limit, search, role, is_active } = c.req.valid("query");
 
   try {
-    /* A scan reads the whole table, so search and paging happen in memory, which is fine for a small demo list */
+    /* Scans the whole table and filters in memory, fine for a small list */
     const { data: users } = await UserEntity
       .scan
       .go({
@@ -19,7 +19,7 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
         attributes: ["user_id", "email", "name", "role", "is_active"],
       });
 
-    /* All filters in one pass; search covers the name and the email, which is stored lowercase */
+    /* Search matches the name or the email (emails are stored lowercase) */
     const searchTerm = search?.toLowerCase();
     const filteredUsers = users.filter((user) => {
       if (role && user.role !== role) return false;
@@ -28,7 +28,7 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
       return true;
     });
 
-    /* Paginate */
+    /* Cut out the requested page */
     const offset = (page - 1) * limit;
     const total = filteredUsers.length;
     const pageRows = filteredUsers.slice(offset, offset + limit);
@@ -37,7 +37,6 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
       message: "Users fetched successfully.",
       data: pageRows.map(toPublicUser),
       count: pageRows.length,
-      /* total_pages is at least 1, so an empty list still shows one page */
       pagination: {
         page,
         limit,

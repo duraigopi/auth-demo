@@ -6,11 +6,12 @@ import { logError } from "@backend/utils/logger";
 import type { AuthValidatedContext } from "@backend/types/api";
 import type { UserIdParam } from "@backend/types/auth";
 
-/* Permanent delete; use disable instead to keep the record. The sessions left behind expire through their ttl */
+/* Permanently deletes the user (use disable to keep the record), leftover sessions expire through their ttl */
 export const remove = async (c: AuthValidatedContext<{ param: UserIdParam }>) => {
   const { userId } = c.req.valid("param");
 
   try {
+    /* An admin can't delete their own account */
     if (userId === c.var.auth.userId) {
       const response = formatErrorResponse({
         message: "You cannot delete your own account.",

@@ -6,11 +6,11 @@ import { logError } from "@backend/utils/logger";
 import type { AuthValidatedContext } from "@backend/types/api";
 import type { UserIdParam } from "@backend/types/auth";
 
-/* Blocks sign-in and refresh but keeps the record, so the user can be enabled again */
 export const disable = async (c: AuthValidatedContext<{ param: UserIdParam }>) => {
   const { userId } = c.req.valid("param");
 
   try {
+    /* An admin can't disable their own account */
     if (userId === c.var.auth.userId) {
       const response = formatErrorResponse({
         message: "You cannot disable your own account.",

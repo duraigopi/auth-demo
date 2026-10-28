@@ -1,7 +1,7 @@
 /* Backend module imports */
 import { getISOString } from "@backend/utils/time-calculations";
 
-/* Title format is [MODULE-ACTION]: Description, so logs can be searched by module */
+/* Writes an error line to the logs */
 export const logError = ({ title, data }: {
   title: string;
   data?: Record<string, unknown>;
@@ -12,6 +12,7 @@ export const logError = ({ title, data }: {
   });
 };
 
+/* Writes an info line to the logs */
 export const logInfo = ({ title, data }: {
   title: string;
   data?: Record<string, unknown>;

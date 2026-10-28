@@ -16,7 +16,6 @@ import type { RefreshFormData } from "@backend/types/auth";
 export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
   const { token } = c.req.valid("json");
 
-  /* Every way a refresh token can be wrong gets the same reply, so nothing is revealed about which part failed */
   const sessionEnded = () => {
     const response = formatErrorResponse({
       message: "Your session has ended. Please log in again.",
@@ -26,10 +25,11 @@ export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
   };
 
   try {
+    /* Check the signature and that this is a refresh token */
     const payload = await verifyRefreshToken(token);
     if (!payload) return sessionEnded();
 
-    /* Independent reads, so they run together; the consistent read makes sure a token that was just replaced is never accepted */
+    /* Consistent read, so a token that was just rotated can't be accepted again */
     const [{ data: session }, { data: user }] = await Promise.all([
       SessionEntity
         .get({ session_id: String(payload.sid) })
@@ -44,6 +44,7 @@ export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
         }),
     ]);
 
+    /* The session must be active, belong to this user and match the latest refresh token */
     if (
       !session
       || !user
@@ -56,7 +57,7 @@ export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
       return sessionEnded();
     }
 
-    /* The swap only succeeds while the stored token id is still the one just checked, so two simultaneous refreshes cannot both win */
+    /* Rotate the token with a conditional update, so only one of two concurrent refreshes succeeds */
     const tokenId = nanoid();
     try {
       await SessionEntity
@@ -65,7 +66,7 @@ export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
         .where(({ refresh_token }, { eq }) => eq(refresh_token, session.refresh_token))
         .go();
     } catch {
-      /* Someone else already used this token, so it may have been copied; the whole session is ended */
+      /* The token was already used, which could mean it was copied, so end the session */
       await SessionEntity
         .patch({ session_id: session.session_id })
         .set({ is_revoked: true })

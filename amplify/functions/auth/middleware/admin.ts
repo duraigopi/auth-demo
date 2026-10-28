@@ -1,4 +1,4 @@
-/* Admin middleware, lets only admins through; it must come after the auth middleware */
+/* Admin-only guard, must run after authMiddleware */
 
 /* Library imports */
 import type { Context, Next } from "hono";

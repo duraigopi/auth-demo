@@ -1,11 +1,7 @@
-/* Shared list query schema */
-
 /* Library imports */
 import { z } from "zod/v4";
 
-/* Common pagination and search params for list endpoints; each list adds its own filters */
 export const listQuerySchema = z.object({
-  /* Query values arrive as text, so the numbers are coerced */
   page: z.coerce
     .number({ message: "Please provide a valid page number" })
     .int({ message: "Please provide a valid page number" })

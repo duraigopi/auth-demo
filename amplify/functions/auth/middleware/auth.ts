@@ -1,5 +1,3 @@
-/* Auth middleware, verifies the access token and records who the caller is */
-
 /* Library imports */
 import type { Context, Next } from "hono";
 
@@ -12,7 +10,6 @@ import { verifyToken } from "@backend/utils/token";
 import type { AuthEnv } from "@backend/types/api";
 import type { UserRole } from "@backend/types/auth";
 
-/* Hono middleware that verifies the access token and sets c.var.auth for the handlers after it */
 export const authMiddleware = async (c: Context<AuthEnv>, next: Next) => {
   const authorization = c.req.header("Authorization");
   const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : undefined;
@@ -28,7 +25,6 @@ export const authMiddleware = async (c: Context<AuthEnv>, next: Next) => {
   try {
     const payload = await verifyToken(token);
 
-    /* A refresh token is signed with the same key, so its type must be checked here */
     if (payload.typ !== TOKEN_TYPE.ACCESS) {
       const response = formatErrorResponse({
         message: "Invalid authorization token.",
@@ -55,6 +51,5 @@ export const authMiddleware = async (c: Context<AuthEnv>, next: Next) => {
     return c.json(response, 401);
   }
 
-  /* Outside the try, so an error in a later handler is not reported as a bad token */
   return next();
 };

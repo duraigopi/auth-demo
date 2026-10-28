@@ -7,7 +7,7 @@ import { AUTH_CONFIG, TOKEN_TYPE } from "@backend/constants/auth";
 import { addDaysToUnixTimestamp, addMinutesToUnixTimestamp, getUnixTimestamp } from "@backend/utils/time-calculations";
 import type { UserRole } from "@backend/types/auth";
 
-/* Signed access token (HS256); sid ties it to the session row that can be revoked */
+/* Creates the short-lived access token */
 export const createAccessToken = ({ userId, role, sessionId }: {
   userId: string;
   role: UserRole;
@@ -21,7 +21,7 @@ export const createAccessToken = ({ userId, role, sessionId }: {
   exp: addMinutesToUnixTimestamp(AUTH_CONFIG.ACCESS_TOKEN_MINUTES),
 }, JWT_SECRET);
 
-/* Signed refresh token; sub lets the user be read at the same time as the session, and jti must match the id stored on the session, so each refresh replaces the previous token */
+/* Refresh token, jti must match the session's refresh_token so each refresh invalidates the previous one */
 export const createRefreshToken = ({ userId, sessionId, tokenId }: {
   userId: string;
   sessionId: string;
@@ -35,10 +35,10 @@ export const createRefreshToken = ({ userId, sessionId, tokenId }: {
   exp: addDaysToUnixTimestamp(AUTH_CONFIG.SESSION_DAYS),
 }, JWT_SECRET);
 
-/* Throws when the signature is wrong or the token has expired */
+/* Checks the signature and expiry, and throws if either is invalid */
 export const verifyToken = (token: string) => verify(token, JWT_SECRET, "HS256");
 
-/* Payload of a valid, unexpired refresh token, or null for anything else, including an access token */
+/* Returns the token payload for a valid refresh token, otherwise null */
 export const verifyRefreshToken = async (token: string) => {
   try {
     const payload = await verifyToken(token);

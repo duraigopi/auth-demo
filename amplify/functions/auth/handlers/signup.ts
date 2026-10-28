@@ -16,7 +16,7 @@ export const signup = async (c: ValidatedJsonContext<SignupFormData>) => {
   const { name, email, password } = c.req.valid("json");
 
   try {
-    /* Not atomic, since an index cannot enforce uniqueness, so two simultaneous signups could both pass */
+    /* Reject an email that already has an account (not atomic: concurrent signups could both pass) */
     const { data: existing } = await UserEntity
       .query.byEmail({ email })
       .go({
@@ -30,9 +30,10 @@ export const signup = async (c: ValidatedJsonContext<SignupFormData>) => {
       return c.json(response, 409);
     }
 
+    /* Only the bcrypt hash is stored */
     const passwordHash = await hashPassword(password);
 
-    /* Role is fixed here and never read from the request, so nobody can sign up as an admin */
+    /* Signups are always CLIENT, the role is never taken from the request */
     const { data: created } = await UserEntity.create({
       user_id: nanoid(),
       email,

@@ -1,10 +1,8 @@
-/* ElectroDB entity for the Users table (PK: user_id), used for sign-in and the user list */
-
 /* Library imports */
 import { CustomAttributeType, Entity } from "electrodb";
 
 /* Backend module imports */
-import { TABLES, TABLE_INDEXES, USER_ROLE, USER_ROLE_VALUES } from "@backend/constants/auth";
+import { USER_ROLE, USER_ROLE_VALUES } from "@backend/constants/auth";
 import { dynamoDBClient } from "@backend/services/aws-clients";
 import { getISOString } from "@backend/utils/time-calculations";
 import type { UserRole } from "@backend/types/auth";
@@ -17,14 +15,12 @@ export const UserEntity = new Entity(
       service: "authDemo",
     },
     attributes: {
-      /* Identity */
-
-      /* PK, generated user identifier */
+      /* Partition key, generated when the user is created */
       user_id: {
         type: "string",
         required: true,
       },
-      /* Lowercased on write so the email index lookup is case-insensitive */
+      /* Key of the email index; stored lowercase so lookups are case-insensitive */
       email: {
         type: "string",
         required: true,
@@ -35,15 +31,10 @@ export const UserEntity = new Entity(
         required: true,
       },
 
-      /* Authentication */
-
-      /* Hash only, the plain password is never stored */
       password_hash: {
         type: "string",
         required: true,
       },
-
-      /* Access */
 
       role: {
         type: CustomAttributeType<UserRole>("string"),
@@ -51,22 +42,17 @@ export const UserEntity = new Entity(
         enum: USER_ROLE_VALUES,
         default: USER_ROLE.CLIENT,
       },
-      /* False blocks sign-in without deleting the row */
       is_active: {
         type: "boolean",
         default: true,
       },
 
-      /* Timestamps */
-
-      /* ISO-8601 UTC, set once on insert */
       created_at: {
         type: "string",
         required: true,
         readOnly: true,
         default: () => getISOString(),
       },
-      /* ISO-8601 UTC, bumped on every create or update via watch */
       updated_at: {
         type: "string",
         watch: "*",
@@ -74,15 +60,16 @@ export const UserEntity = new Entity(
       },
     },
     indexes: {
+      /* Partition key only: one row per user */
       primary: {
         pk: { field: "user_id", composite: ["user_id"] },
       },
-      /* Sign-in and duplicate-email checks look users up by email */
+      /* Secondary index on email, used by login and the duplicate-email check */
       byEmail: {
-        index: TABLE_INDEXES.USERS_BY_EMAIL,
+        index: "email-index",
         pk: { field: "email", composite: ["email"] },
       },
     },
   },
-  { client: dynamoDBClient, table: TABLES.USERS },
+  { client: dynamoDBClient, table: "Users" },
 );

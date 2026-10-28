@@ -25,7 +25,7 @@ export const update = async (c: AuthValidatedContext<{ param: UserIdParam; json:
       return c.json(response, 404);
     }
 
-    /* Stops an admin from demoting themselves, which could leave nobody able to manage users */
+    /* An admin can't remove their own admin role, so someone can always manage users */
     const losesAdminAccess = changes.role !== undefined && changes.role !== USER_ROLE.ADMIN;
     if (userId === c.var.auth.userId && losesAdminAccess) {
       const response = formatErrorResponse({

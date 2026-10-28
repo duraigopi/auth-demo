@@ -1,7 +1,7 @@
 /* Library imports */
 import { z } from "zod/v4";
 
-/* Trimmed and lowercased here, so every handler receives the normalized email */
+/* Normalized here so handlers always get a trimmed, lowercase email */
 export const emailField = z
   .string()
   .trim()
@@ -23,7 +23,6 @@ export const nameField = z
   .min(1, "Please enter your full name")
   .max(100, "Please enter a name less than 100 characters");
 
-/* The rules for a new password, shared by signup and the admin schemas */
 export const passwordField = z
   .string()
   .min(8, "Please enter a password with at least 8 characters")
@@ -33,7 +32,7 @@ export const passwordField = z
   .regex(/[0-9]/, "Please include at least one number in your password")
   .regex(/[^A-Za-z0-9]/, "Please include at least one special character in your password");
 
-/* Mirrors the signup form, since the browser check can be skipped */
+/* Same rules as the signup form, since the frontend check can be bypassed */
 export const signupSchema = z.object({
   name: nameField,
   email: emailField,
@@ -46,3 +45,21 @@ export const refreshSchema = z.object({
     .min(1, "Please provide the refresh token")
     .max(1000, "Please provide a valid refresh token"),
 });
+
+export const updateProfileSchema = z.object({
+  name: nameField,
+});
+
+/* Requires the current password so a stolen access token isn't enough */
+export const changePasswordSchema = z
+  .object({
+    current_password: z
+      .string()
+      .min(1, "Please enter your current password")
+      .max(128, "Please enter a password less than 128 characters"),
+    new_password: passwordField,
+  })
+  .refine((data) => data.new_password !== data.current_password, {
+    message: "Please choose a password different from your current one",
+    path: ["new_password"],
+  });

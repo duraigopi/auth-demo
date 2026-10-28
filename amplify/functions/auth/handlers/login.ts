@@ -20,7 +20,6 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
   const { email, password } = c.req.valid("json");
 
   try {
-    /* Independent reads, so they run together instead of one after the other */
     const [{ data: attempt }, { data: users }] = await Promise.all([
       LoginAttemptEntity
         .get({ email })
@@ -35,6 +34,7 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
     ]);
     const user = users[0];
 
+    /* A locked account can't log in until the lock expires */
     if (attempt?.locked_until && !isISOExpired(attempt.locked_until)) {
       const response = formatErrorResponse({
         message: "Too many failed attempts. Please try again later.",
@@ -43,15 +43,16 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
       return c.json(response, 429);
     }
 
-    /* An unknown email and a wrong password get the same reply, so the response never reveals which emails exist */
+    /* An unknown email gets the same response as a wrong password, so emails can't be enumerated */
     const isPasswordValid = user ? await verifyPassword(password, user.password_hash) : false;
     if (!user || !isPasswordValid) {
-      /* Atomic add, so two simultaneous wrong passwords both count */
+      /* Atomic increment so concurrent failures are all counted */
       const { data: updated } = await LoginAttemptEntity
         .update({ email })
         .add({ failed_count: 1 })
         .set({ ttl: addDaysToUnixTimestamp(AUTH_CONFIG.LOGIN_ATTEMPT_TTL_DAYS) })
         .go({ response: "all_new" });
+      /* Lock the account once the limit is reached */
       if ((updated.failed_count ?? 0) >= AUTH_CONFIG.MAX_FAILED_ATTEMPTS) {
         await LoginAttemptEntity
           .update({ email })
@@ -68,7 +69,7 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
       return c.json(response, 401);
     }
 
-    /* Told only after the password is right, so this reply cannot be used to find out which emails exist */
+    /* Only shown after a correct password, so it doesn't reveal which emails exist */
     if (!user.is_active) {
       const response = formatErrorResponse({
         message: "Your account is inactive. Please contact the admin.",
@@ -80,7 +81,7 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
     const sessionId = nanoid();
     const tokenId = nanoid();
 
-    /* Independent writes, so they run together */
+    /* Clear the earlier failed attempts and create the session */
     await Promise.all([
       LoginAttemptEntity.delete({ email }).go(),
       SessionEntity.create({

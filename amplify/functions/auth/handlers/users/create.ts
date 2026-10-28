@@ -14,7 +14,7 @@ export const create = async (c: AuthValidatedContext<{ json: CreateUserFormData 
   const { name, email, password, role } = c.req.valid("json");
 
   try {
-    /* Not atomic, since an index cannot enforce uniqueness, so two simultaneous requests could both pass */
+    /* Not atomic: two concurrent requests with the same email could both pass this check */
     const { data: existing } = await UserEntity
       .query.byEmail({ email })
       .go({ attributes: ["user_id"] });
@@ -26,6 +26,7 @@ export const create = async (c: AuthValidatedContext<{ json: CreateUserFormData 
       return c.json(response, 409);
     }
 
+    /* Only the bcrypt hash is stored */
     const passwordHash = await hashPassword(password);
     await UserEntity.create({
       user_id: nanoid(),

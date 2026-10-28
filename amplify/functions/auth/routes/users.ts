@@ -1,5 +1,3 @@
-/* Users route definitions */
-
 /* Library imports */
 import { Hono } from "hono";
 
@@ -21,26 +19,26 @@ import { update } from "@backend/handlers/users/update";
 
 export const usersRoutes = new Hono<AuthEnv>();
 
-/* Every user route needs a signed-in admin */
+/* All user routes are admin-only */
 usersRoutes.use("*", authMiddleware, adminMiddleware);
 
-/* GET / — List users with search, role and active filters, and pagination */
+/* GET /: list users with search, filters and pagination */
 usersRoutes.get("/", zValidatorWrapper("query", userListQuerySchema), list);
 
-/* GET /:userId — Fetch one user */
+/* GET /:userId: get one user */
 usersRoutes.get("/:userId", zValidatorWrapper("param", userIdParamSchema), get);
 
-/* POST / — Add a user with a chosen role and first password */
+/* POST /: create a user with a role and an initial password */
 usersRoutes.post("/", zValidatorWrapper("json", createUserSchema), create);
 
-/* PUT /:userId — Edit a user's name or role */
+/* PUT /:userId: edit a user's name or role */
 usersRoutes.put("/:userId", zValidatorWrapper("param", userIdParamSchema), zValidatorWrapper("json", updateUserSchema), update);
 
-/* POST /:userId/enable — Let a disabled user sign in again */
+/* POST /:userId/enable: re-enable a disabled user */
 usersRoutes.post("/:userId/enable", zValidatorWrapper("param", userIdParamSchema), enable);
 
-/* POST /:userId/disable — Block a user from signing in, keeping the record */
+/* POST /:userId/disable: block login but keep the record */
 usersRoutes.post("/:userId/disable", zValidatorWrapper("param", userIdParamSchema), disable);
 
-/* DELETE /:userId — Permanently remove a user */
+/* DELETE /:userId: permanently delete a user */
 usersRoutes.delete("/:userId", zValidatorWrapper("param", userIdParamSchema), remove);

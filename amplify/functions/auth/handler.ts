@@ -17,51 +17,46 @@ import { ERROR_CODES, ERROR_MESSAGES } from "@backend/constants/error-messages";
 import { formatErrorResponse } from "@backend/utils/api-response";
 import { logError, logInfo } from "@backend/utils/logger";
 
-/* Auth module imports */
+/* Route imports */
 import { authRoutes } from "@backend/routes/auth";
 import { meRoutes } from "@backend/routes/me";
 import { usersRoutes } from "@backend/routes/users";
 
-/* Exported so an OpenAPI generator can read the mounted routes later */
 export const app = new Hono();
 const v1 = app.basePath("/api/v1");
 
-/* Request pipeline, each layer is placed so it sees what the one before it has already settled */
+/* Middleware order matters: each layer runs before the ones below it */
 
-/* 1. Request tracing, first so every log line is correlatable to one invocation */
+/* Adds a request id to every request, so log lines can be tied together */
 app.use("*", requestId());
 
-/* 2. Request logging, ahead of the guards, since rejected traffic is the traffic worth seeing */
+/* Logs the method, path and status of every request, including rejected ones */
 app.use("*", logger((line) => logInfo({ title: "[REQUEST]: Handled", data: { line } })));
 
-/* 3. CORS, ahead of every guard below so their 4xx bodies carry the headers, or the browser reports a network failure instead of the real reason */
+/* CORS comes before the guards so their error responses also get the CORS headers */
 app.use("*", cors({
   origin: CORS_ALLOWED_ORIGINS,
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowHeaders: CORS_ALLOWED_HEADERS,
 }));
 
-/* 4. Security headers, outside the body ceiling, so an oversized-payload rejection is hardened too. Tuned for a JSON API that never renders anything, so the strictest policy is also the correct one. */
+/* Security headers. This API only returns JSON, so the CSP can deny everything */
 app.use("*", secureHeaders({
   contentSecurityPolicy: {
     defaultSrc: ["'none'"],
     frameAncestors: ["'none'"],
   },
-  /* A year, without preload, since preloading is a hard-to-reverse commitment covering the whole domain */
   strictTransportSecurity: "max-age=31536000; includeSubDomains",
   xContentTypeOptions: "nosniff",
   xFrameOptions: "DENY",
-  /* Off, since the legacy auditor is deprecated and its filtering has introduced vulnerabilities of its own */
   xXssProtection: "0",
   referrerPolicy: "no-referrer",
-  /* Blocks another site from pulling a response in as a no-cors subresource */
   crossOriginResourcePolicy: "same-origin",
 }));
 
-/* 5. Body ceiling, rejects an oversized payload before anything downstream parses it */
+/* Rejects request bodies above the size limit before anything parses them */
 app.use("*", bodyLimit({
   maxSize: REQUEST_LIMITS.MAX_BODY_SIZE_KB * 1024,
-  /* Replaces the package's bare text body so a 413 carries the same envelope as every other error */
   onError: (c) => {
     const response = formatErrorResponse({
       message: `Request body is too large. The maximum size is ${REQUEST_LIMITS.MAX_BODY_SIZE_KB}KB.`,
@@ -71,13 +66,12 @@ app.use("*", bodyLimit({
   },
 }));
 
-/* 6. Rate cap per caller. Keyed on the source IP from the Lambda event rather than a header, because x-forwarded-for is caller-supplied and a forged value would mint a fresh bucket per request. An unresolvable caller shares one bucket instead of escaping the cap. */
+/* Rate limit per caller, keyed on the source IP from the Lambda event. x-forwarded-for isn't used because the caller controls it */
 app.use("*", rateLimiter({
   windowMs: RATE_LIMIT.WINDOW_MS,
   limit: RATE_LIMIT.MAX_REQUESTS,
   standardHeaders: "draft-7",
   keyGenerator: (c) => (c.env as { event?: APIGatewayProxyEventV2 }).event?.requestContext.http.sourceIp ?? "unknown",
-  /* Replaces the package's plain-string body so a 429 carries the same envelope as every other error */
   handler: (c) => {
     logError({
       title: "[RATE-LIMIT] 429: Caller exceeded the request cap",
@@ -91,11 +85,12 @@ app.use("*", rateLimiter({
   },
 }));
 
+/* Route groups */
 v1.route("/auth", authRoutes);
 v1.route("/me", meRoutes);
 v1.route("/users", usersRoutes);
 
-/* 404 fallback */
+/* Reply for unknown routes */
 app.notFound((c) => {
   logError({
     title: "[AUTH-API]: Route not found",
@@ -108,9 +103,8 @@ app.notFound((c) => {
   return c.json(response, 404);
 });
 
-/* Global error handler */
+/* Last-resort handler: any error that wasn't handled in a route ends up here */
 app.onError((err, c) => {
-  /* Errors Hono raises on purpose, such as a malformed JSON body, keep their own status */
   if (err instanceof HTTPException) return err.getResponse();
 
   const errorMessage = err instanceof Error ? err.message : ERROR_MESSAGES.INTERNAL_SERVER_ERROR;

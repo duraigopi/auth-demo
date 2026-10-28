@@ -1,5 +1,3 @@
-/* Shared request validator, the zValidator wrapper with our error response format */
-
 /* Library imports */
 import type { ValidationTargets } from "hono";
 import type { $ZodType } from "zod/v4/core";
@@ -9,7 +7,7 @@ import { zValidator } from "@hono/zod-validator";
 import { ERROR_CODES, ERROR_MESSAGES } from "@backend/constants/error-messages";
 import { formatErrorResponse } from "@backend/utils/api-response";
 
-/* Wraps @hono/zod-validator with the custom error response format, works with the json, param and query targets */
+/* Validates a request part (json, param or query) and returns our error body when it fails */
 export const zValidatorWrapper = <T extends $ZodType, Target extends keyof ValidationTargets>(target: Target, schema: T) =>
   zValidator(target, schema, (result, c) => {
     if (result.success === false) {

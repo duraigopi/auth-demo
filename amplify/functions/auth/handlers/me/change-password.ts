@@ -26,6 +26,7 @@ export const changePassword = async (c: AuthValidatedContext<{ json: ChangePassw
       return c.json(response, 404);
     }
 
+    /* The current password has to be right, so a stolen access token isn't enough */
     const isCurrentPasswordValid = await verifyPassword(current_password, user.password_hash);
     if (!isCurrentPasswordValid) {
       const response = formatErrorResponse({
@@ -36,7 +37,7 @@ export const changePassword = async (c: AuthValidatedContext<{ json: ChangePassw
     }
 
     const passwordHash = await hashPassword(new_password);
-    /* Independent calls, so they run together; the sessions are only read here and are revoked after the password is saved */
+    /* Save the new password and look up the other active sessions at the same time */
     const [, { data: sessions }] = await Promise.all([
       UserEntity
         .patch({ user_id: userId })
@@ -51,7 +52,7 @@ export const changePassword = async (c: AuthValidatedContext<{ json: ChangePassw
         }),
     ]);
 
-    /* Every other login is ended, so a device that knew the old password stops working; this session stays signed in */
+    /* Sign out the other sessions, the current one stays signed in */
     await Promise.all(
       sessions
         .filter((session) => session.session_id !== sessionId)

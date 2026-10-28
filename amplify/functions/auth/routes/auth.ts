@@ -1,5 +1,3 @@
-/* Auth route definitions */
-
 /* Library imports */
 import { Hono } from "hono";
 
@@ -8,7 +6,7 @@ import { authMiddleware } from "@backend/middleware/auth";
 import { loginSchema, refreshSchema, signupSchema } from "@backend/schemas/auth";
 import { zValidatorWrapper } from "@backend/utils/schema-validator";
 
-/* Auth module imports */
+/* Handler imports */
 import { login } from "@backend/handlers/login";
 import { logout } from "@backend/handlers/logout";
 import { refresh } from "@backend/handlers/refresh";
@@ -16,14 +14,14 @@ import { signup } from "@backend/handlers/signup";
 
 export const authRoutes = new Hono();
 
-/* POST /signup — Create a client account; unauthenticated, since the caller has no token yet */
+/* POST /signup: create a client account (public) */
 authRoutes.post("/signup", zValidatorWrapper("json", signupSchema), signup);
 
-/* POST /login — Check credentials and open a session; unauthenticated for the same reason */
+/* POST /login: check credentials and start a session (public) */
 authRoutes.post("/login", zValidatorWrapper("json", loginSchema), login);
 
-/* POST /refresh — Swap a valid refresh token for a new access token and a new refresh token; unauthenticated, since the access token has usually expired */
+/* POST /refresh: exchange a refresh token for new tokens (public, the access token has usually expired) */
 authRoutes.post("/refresh", zValidatorWrapper("json", refreshSchema), refresh);
 
-/* POST /logout — Revoke the caller's session; needs a valid access token */
+/* POST /logout: revoke the current session */
 authRoutes.post("/logout", authMiddleware, logout);
