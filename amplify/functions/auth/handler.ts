@@ -10,12 +10,14 @@ import { logError } from "@backend/utils/logger";
 
 /* Auth module imports */
 import { authRoutes } from "@backend/routes/auth";
+import { usersRoutes } from "@backend/routes/users";
 
 /* Exported so an OpenAPI generator can read the mounted routes later */
 export const app = new Hono();
 const v1 = app.basePath("/api/v1");
 
 v1.route("/auth", authRoutes);
+v1.route("/users", usersRoutes);
 
 /* 404 fallback */
 app.notFound((c) => {

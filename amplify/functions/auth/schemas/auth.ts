@@ -2,7 +2,7 @@
 import { z } from "zod/v4";
 
 /* Trimmed and lowercased here, so every handler receives the normalized email */
-const emailField = z
+export const emailField = z
   .string()
   .trim()
   .toLowerCase()
@@ -18,21 +18,26 @@ export const loginSchema = z.object({
     .max(128, "Please enter a password less than 128 characters"),
 });
 
+export const nameField = z
+  .string()
+  .min(1, "Please enter your full name")
+  .max(100, "Please enter a name less than 100 characters");
+
+/* The rules for a new password, shared by signup and the admin schemas */
+export const passwordField = z
+  .string()
+  .min(8, "Please enter a password with at least 8 characters")
+  .max(128, "Please enter a password less than 128 characters")
+  .regex(/[A-Z]/, "Please include at least one uppercase letter in your password")
+  .regex(/[a-z]/, "Please include at least one lowercase letter in your password")
+  .regex(/[0-9]/, "Please include at least one number in your password")
+  .regex(/[^A-Za-z0-9]/, "Please include at least one special character in your password");
+
 /* Mirrors the signup form, since the browser check can be skipped */
 export const signupSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Please enter your full name")
-    .max(100, "Please enter a name less than 100 characters"),
+  name: nameField,
   email: emailField,
-  password: z
-    .string()
-    .min(8, "Please enter a password with at least 8 characters")
-    .max(128, "Please enter a password less than 128 characters")
-    .regex(/[A-Z]/, "Please include at least one uppercase letter in your password")
-    .regex(/[a-z]/, "Please include at least one lowercase letter in your password")
-    .regex(/[0-9]/, "Please include at least one number in your password")
-    .regex(/[^A-Za-z0-9]/, "Please include at least one special character in your password"),
+  password: passwordField,
 });
 
 export const refreshSchema = z.object({

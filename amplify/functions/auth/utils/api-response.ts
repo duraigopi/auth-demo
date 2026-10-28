@@ -1,18 +1,20 @@
 /* Backend module imports */
 import { getISOString } from "@backend/utils/time-calculations";
-import type { ApiResponse, PayloadValidationError } from "@backend/types/api";
+import type { ApiResponse, PaginationMeta, PayloadValidationError } from "@backend/types/api";
 
-/* Create standardized success response with optional data and count */
-export const formatSuccessResponse = <T = unknown>({ message, data, count }: {
+/* Create standardized success response with optional data, count and pagination */
+export const formatSuccessResponse = <T = unknown>({ message, data, count, pagination }: {
   message: string;
   data?: T;
   count?: number;
+  pagination?: PaginationMeta;
 }): ApiResponse<T> => {
   const response = {
     success: true,
     message,
     ...(data !== undefined && { data }),
     ...(count !== undefined && { count }),
+    ...(pagination !== undefined && { pagination }),
     timestamp: getISOString(),
   };
 

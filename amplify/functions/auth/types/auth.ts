@@ -6,6 +6,8 @@ import type { z } from "zod/v4";
 import type { USER_ROLE } from "@backend/constants/auth";
 import type { UserEntity } from "@backend/entities/user";
 import type { loginSchema, refreshSchema, signupSchema } from "@backend/schemas/auth";
+import type { listQuerySchema } from "@backend/schemas/query";
+import type { createUserSchema, updateUserSchema, userIdParamSchema, userListQuerySchema } from "@backend/schemas/user";
 
 /* Role values a user can have */
 export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE];
@@ -28,3 +30,18 @@ export interface AuthContext {
   role: UserRole;
   sessionId: string;
 }
+
+/* Admin create-user request body, derived from the create-user schema */
+export type CreateUserFormData = z.infer<typeof createUserSchema>;
+
+/* Admin edit-user request body, derived from the update-user schema */
+export type UpdateUserFormData = z.infer<typeof updateUserSchema>;
+
+/* Path parameters of the user routes, derived from the user-id schema */
+export type UserIdParam = z.infer<typeof userIdParamSchema>;
+
+/* Pagination and search params shared by every list endpoint */
+export type ListQueryParams = z.infer<typeof listQuerySchema>;
+
+/* Query params accepted by GET /users */
+export type UserListQueryParams = z.infer<typeof userListQuerySchema>;

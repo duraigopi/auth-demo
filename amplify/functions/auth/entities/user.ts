@@ -62,6 +62,7 @@ export const UserEntity = new Entity(
       /* ISO-8601 UTC, set once on insert */
       created_at: {
         type: "string",
+        required: true,
         readOnly: true,
         default: () => getISOString(),
       },
