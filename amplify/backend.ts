@@ -1,9 +1,10 @@
 /* Library imports */
 import { posix } from "path";
 import { defineBackend } from "@aws-amplify/backend";
-import { CfnOutput } from "aws-cdk-lib";
+import { CfnOutput, RemovalPolicy } from "aws-cdk-lib";
 import { CorsHttpMethod, HttpApi } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
 
 /* Resource imports */
 import { authFunction } from "./functions/auth/resource";
@@ -45,6 +46,47 @@ API_ROUTES.forEach(({ basePath, routes }) => {
     });
   });
 });
+
+/* Tables live in their own stack. Names, keys and index names must match the entities in functions/auth/entities. */
+const dataStack = backend.createStack("data-stack");
+
+const usersTable = new Table(dataStack, "UsersTable", {
+  tableName: "Users",
+  partitionKey: { name: "user_id", type: AttributeType.STRING },
+  billingMode: BillingMode.PAY_PER_REQUEST,
+  /* Demo setting: deleting the stack deletes the data. Use RETAIN once real accounts exist. */
+  removalPolicy: RemovalPolicy.DESTROY,
+});
+usersTable.addGlobalSecondaryIndex({
+  indexName: "email-index",
+  partitionKey: { name: "email", type: AttributeType.STRING },
+});
+
+const sessionsTable = new Table(dataStack, "SessionsTable", {
+  tableName: "Sessions",
+  partitionKey: { name: "session_id", type: AttributeType.STRING },
+  billingMode: BillingMode.PAY_PER_REQUEST,
+  /* DynamoDB deletes a row once its ttl time (Unix seconds) has passed */
+  timeToLiveAttribute: "ttl",
+  removalPolicy: RemovalPolicy.DESTROY,
+});
+sessionsTable.addGlobalSecondaryIndex({
+  indexName: "user_id-index",
+  partitionKey: { name: "user_id", type: AttributeType.STRING },
+});
+
+const loginAttemptsTable = new Table(dataStack, "LoginAttemptsTable", {
+  tableName: "LoginAttempts",
+  partitionKey: { name: "email", type: AttributeType.STRING },
+  billingMode: BillingMode.PAY_PER_REQUEST,
+  timeToLiveAttribute: "ttl",
+  removalPolicy: RemovalPolicy.DESTROY,
+});
+
+/* Read and write access for the Lambda, including the indexes */
+usersTable.grantReadWriteData(backend.authFunction.resources.lambda);
+sessionsTable.grantReadWriteData(backend.authFunction.resources.lambda);
+loginAttemptsTable.grantReadWriteData(backend.authFunction.resources.lambda);
 
 /* The base URL shows up in the stack outputs and in amplify_outputs.json for the frontend */
 new CfnOutput(apiStack, "AuthApiUrl", { value: httpApi.apiEndpoint });

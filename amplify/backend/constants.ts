@@ -18,6 +18,7 @@ export const API_ROUTES: RouteGroupDefinition[] = [
   {
     basePath: "auth",
     routes: [
+      { path: "setup-admin", methods: [HttpMethod.POST] },
       { path: "signup", methods: [HttpMethod.POST] },
       { path: "login", methods: [HttpMethod.POST] },
       { path: "refresh", methods: [HttpMethod.POST] },
