@@ -12,7 +12,7 @@ import { LuLock, LuMail } from "react-icons/lu";
 /* Lib module imports */
 import { loginApi } from "@lib/api/auth";
 import { loginSchema } from "@lib/schema/auth";
-import type { LoginFormData, LoginResponseData } from "@lib/types/auth";
+import type { LoginFormData, LoginResponse } from "@lib/types/auth";
 
 /* Shared module imports */
 import { PasswordField } from "@shared/components/password-field";
@@ -31,7 +31,7 @@ export const LoginForm = () => {
     },
   });
 
-  const { mutate: login, isLoading } = useApiMutation<LoginResponseData, LoginFormData>({
+  const { mutate: login, isLoading } = useApiMutation<LoginResponse, LoginFormData>({
     mutationFn: loginApi,
     successTitle: "Logged In Successfully",
     successDescription: "Welcome back.",

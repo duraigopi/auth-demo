@@ -23,9 +23,15 @@ export interface PublicUser {
 }
 
 /* What login returns: both tokens and the signed-in user */
-export interface LoginResponseData extends AuthTokens {
+export interface LoginResponse extends AuthTokens {
   user: PublicUser;
 }
+
+/* What signup, GET /me and GET /users/{userId} return */
+export type UserResponse = PublicUser;
+
+/* What GET /users returns */
+export type UserListResponse = PublicUser[];
 
 /* Body of POST /auth/signup, the form without its confirm-password field */
 export type SignupRequestBody = Pick<SignupFormData, "name" | "email" | "password">;
