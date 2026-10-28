@@ -35,3 +35,16 @@ export const USER_ROLE = {
 } as const;
 
 export const USER_ROLE_VALUES: UserRole[] = Object.values(USER_ROLE);
+
+export const CORS_ALLOWED_HEADERS = ["Content-Type", "Authorization"];
+
+/* Request ceilings; every body here is small JSON, so the limit is low */
+export const REQUEST_LIMITS = {
+  MAX_BODY_SIZE_KB: 100,
+} as const;
+
+/* Requests one caller may make per window; the store is per Lambda container, so this curbs one caller's loop rather than a distributed flood */
+export const RATE_LIMIT = {
+  WINDOW_MS: 60 * 1000,
+  MAX_REQUESTS: 120,
+} as const;

@@ -11,3 +11,13 @@ export const logError = ({ title, data }: {
     ...data,
   });
 };
+
+export const logInfo = ({ title, data }: {
+  title: string;
+  data?: Record<string, unknown>;
+}) => {
+  console.info(title, {
+    timestamp: getISOString(),
+    ...data,
+  });
+};
