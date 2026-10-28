@@ -14,7 +14,7 @@ export const get = async (c: AuthValidatedContext<{ param: UserIdParam }>) => {
     const { data: user } = await UserEntity
       .get({ user_id: userId })
       .go({
-        attributes: ["user_id", "email", "name", "role", "is_active"],
+        attributes: ["user_id", "email", "name", "role", "is_active", "created_at"],
       });
     if (!user) {
       const response = formatErrorResponse({

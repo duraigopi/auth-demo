@@ -3,6 +3,7 @@ import type { z } from "zod/v4";
 
 /* Lib module imports */
 import type { loginSchema, signupSchema } from "@lib/schema/auth";
+import type { editUserSchema } from "@lib/schema/users";
 
 /* Shared module imports */
 import type { AuthTokens } from "@shared/types/api";
@@ -13,6 +14,9 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 /* Signup form values, derived from the signup schema */
 export type SignupFormData = z.infer<typeof signupSchema>;
 
+/* Edit-user form values, derived from the edit schema */
+export type EditUserFormData = z.infer<typeof editUserSchema>;
+
 /* A user as the API returns it, without the password hash */
 export interface PublicUser {
   user_id: string;
@@ -20,6 +24,7 @@ export interface PublicUser {
   name: string;
   role: "ADMIN" | "CLIENT";
   is_active: boolean;
+  created_at: string;
 }
 
 /* What login returns: both tokens and the signed-in user */

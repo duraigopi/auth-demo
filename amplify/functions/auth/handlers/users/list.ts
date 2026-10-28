@@ -16,7 +16,7 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
       .scan
       .go({
         pages: "all",
-        attributes: ["user_id", "email", "name", "role", "is_active"],
+        attributes: ["user_id", "email", "name", "role", "is_active", "created_at"],
       });
 
     /* Search matches the name or the email (emails are stored lowercase) */

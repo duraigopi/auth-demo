@@ -14,8 +14,12 @@ import { amplifyDelete, amplifyGet, amplifyPost, amplifyPut } from "@shared/util
 export const listUsersApi = (params: UserListParams) =>
   amplifyGet<UserListResponse>({
     path: USER_ENDPOINTS.LIST,
-    /* Amplify only takes strings here */
-    queryParams: Object.fromEntries(Object.entries(params).map(([key, value]) => [key, String(value)])),
+    /* Amplify only takes strings, and an empty search should not be sent */
+    queryParams: Object.fromEntries(
+      Object.entries(params)
+        .filter(([, value]) => !!value)
+        .map(([key, value]) => [key, String(value)]),
+    ),
   });
 
 export const getUserApi = (userId: string) =>

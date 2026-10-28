@@ -17,9 +17,6 @@ export const AuthLayout = ({ title, subtitle, children }: AuthLayoutProps) => (
     justify="center"
     gap="6"
     p="4"
-    bgGradient="to-b"
-    gradientFrom="#0067D8"
-    gradientTo="#00B398"
   >
     <Stack align="center" gap="1" color="#FFFFFF" textAlign="center">
       <Heading size="3xl">{title}</Heading>

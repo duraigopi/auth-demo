@@ -12,7 +12,7 @@ import type { createUserSchema, updateUserSchema, userIdParamSchema, userListQue
 export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE];
 
 /* User fields that are safe to return to the client (no password hash), built by toPublicUser */
-export type PublicUser = Pick<EntityItem<typeof UserEntity>, "user_id" | "email" | "name" | "role" | "is_active">;
+export type PublicUser = Pick<EntityItem<typeof UserEntity>, "user_id" | "email" | "name" | "role" | "is_active" | "created_at">;
 
 /* Body of POST /auth/login */
 export type LoginFormData = z.infer<typeof loginSchema>;

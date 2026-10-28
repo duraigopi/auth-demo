@@ -43,7 +43,7 @@ export const refresh = async (c: Context) => {
       UserEntity
         .get({ user_id: String(payload.sub) })
         .go({
-          attributes: ["user_id", "email", "name", "role", "is_active"],
+          attributes: ["user_id", "email", "name", "role", "is_active", "created_at"],
         }),
     ]);
 

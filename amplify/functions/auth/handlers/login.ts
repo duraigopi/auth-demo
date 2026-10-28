@@ -29,7 +29,7 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
       UserEntity
         .query.byEmail({ email })
         .go({
-          attributes: ["user_id", "email", "name", "role", "is_active", "password_hash"],
+          attributes: ["user_id", "email", "name", "role", "is_active", "created_at", "password_hash"],
         }),
     ]);
     const user = users[0];

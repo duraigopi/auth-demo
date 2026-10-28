@@ -8,4 +8,5 @@ export const toPublicUser = (user: PublicUser): PublicUser => ({
   name: user.name,
   role: user.role,
   is_active: user.is_active,
+  created_at: user.created_at,
 });
