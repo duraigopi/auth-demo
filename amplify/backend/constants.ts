@@ -2,13 +2,13 @@
 import { HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 
 /* One path under a group's base path */
-export interface RouteDefinition {
+interface RouteDefinition {
   path: string;          /* Segment below the base path, "" means the base path itself */
   methods: HttpMethod[];
 }
 
 /* A base path with the routes below it */
-export interface RouteGroupDefinition {
+interface RouteGroupDefinition {
   basePath: string;
   routes: RouteDefinition[];
 }

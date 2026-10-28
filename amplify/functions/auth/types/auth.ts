@@ -6,7 +6,6 @@ import type { z } from "zod/v4";
 import type { USER_ROLE } from "@backend/constants/auth";
 import type { UserEntity } from "@backend/entities/user";
 import type { changePasswordSchema, loginSchema, signupSchema, updateProfileSchema } from "@backend/schemas/auth";
-import type { listQuerySchema } from "@backend/schemas/query";
 import type { createUserSchema, updateUserSchema, userIdParamSchema, userListQuerySchema } from "@backend/schemas/user";
 
 /* Role a user can have (ADMIN or CLIENT), stored on the user and in the access token */
@@ -36,9 +35,6 @@ export type UpdateUserFormData = z.infer<typeof updateUserSchema>;
 
 /* The :userId path param on the user routes */
 export type UserIdParam = z.infer<typeof userIdParamSchema>;
-
-/* Pagination and search params shared by list endpoints */
-export type ListQueryParams = z.infer<typeof listQuerySchema>;
 
 /* Query params of GET /users */
 export type UserListQueryParams = z.infer<typeof userListQuerySchema>;

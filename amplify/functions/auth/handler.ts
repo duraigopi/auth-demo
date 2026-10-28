@@ -22,7 +22,7 @@ import { authRoutes } from "@backend/routes/auth";
 import { meRoutes } from "@backend/routes/me";
 import { usersRoutes } from "@backend/routes/users";
 
-export const app = new Hono();
+const app = new Hono();
 const v1 = app.basePath("/api/v1");
 
 /* Middleware order matters: each layer runs before the ones below it */
