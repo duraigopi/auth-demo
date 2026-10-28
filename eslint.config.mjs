@@ -5,8 +5,8 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  /* Build output and generated types are not ours to lint */
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  /* Build output and generated types are not ours to lint; the backend has its own toolchain */
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "amplify/**"]),
 
   {
     rules: {

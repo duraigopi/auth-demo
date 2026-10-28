@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    /* No DOM here, so browser globals fail at compile time instead of in Lambda */
+    "lib": ["ES2022"],
+    /* node for synth-time code, aws-lambda for the handler event shapes */
+    "types": ["node", "aws-lambda"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    /* Resolved by the bundler, so they work in handler code but not in the synth-time files backend.ts loads */
+    "paths": {
+      "@backend/*": ["./functions/*"]
+    }
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", ".amplify", "cdk.out"]
+}

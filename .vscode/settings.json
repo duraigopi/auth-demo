@@ -1,0 +1,9 @@
+{
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/.amplify/**": true
+  },
+  "git.autoRepositoryDetection": false,
+  "git.untrackedChanges": "separate"
+}
