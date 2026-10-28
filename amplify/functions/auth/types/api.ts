@@ -24,7 +24,7 @@ export interface ApiResponse<T = unknown> {
 /* Hono context after jsonValidator has accepted the body, which types c.req.valid("json") */
 export type ValidatedJsonContext<T> = Context<Env, string, { out: { json: T } }>;
 
-/* Hono environment for routes behind the authenticate middleware */
+/* Hono environment for routes behind the auth middleware */
 export interface AuthEnv extends Env {
   Variables: {
     auth: AuthContext;

@@ -5,7 +5,7 @@ import { sign, verify } from "hono/jwt";
 import { JWT_SECRET } from "@backend/config/env";
 import { AUTH_CONFIG, TOKEN_TYPE } from "@backend/constants/auth";
 import { addDaysToUnixTimestamp, addMinutesToUnixTimestamp, getUnixTimestamp } from "@backend/utils/time-calculations";
-import type { UserRole } from "@backend/types/user";
+import type { UserRole } from "@backend/types/auth";
 
 /* Signed access token (HS256); sid ties it to the session row that can be revoked */
 export const createAccessToken = ({ userId, role, sessionId }: {

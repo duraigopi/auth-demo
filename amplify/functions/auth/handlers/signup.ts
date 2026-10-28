@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 
 /* Backend module imports */
 import { ERROR_CODES } from "@backend/constants/error-messages";
-import { USER_ROLE } from "@backend/constants/user";
+import { USER_ROLE } from "@backend/constants/auth";
 import { UserEntity } from "@backend/entities/user";
 import { formatErrorResponse, formatSuccessResponse } from "@backend/utils/api-response";
 import { hashPassword } from "@backend/utils/password";

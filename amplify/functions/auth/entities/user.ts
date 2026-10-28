@@ -4,11 +4,10 @@
 import { CustomAttributeType, Entity } from "electrodb";
 
 /* Backend module imports */
-import { TABLES, TABLE_INDEXES } from "@backend/constants/tables";
-import { USER_ROLE, USER_ROLE_VALUES } from "@backend/constants/user";
+import { TABLES, TABLE_INDEXES, USER_ROLE, USER_ROLE_VALUES } from "@backend/constants/auth";
 import { dynamoDBClient } from "@backend/services/aws-clients";
 import { getISOString } from "@backend/utils/time-calculations";
-import type { UserRole } from "@backend/types/user";
+import type { UserRole } from "@backend/types/auth";
 
 export const UserEntity = new Entity(
   {

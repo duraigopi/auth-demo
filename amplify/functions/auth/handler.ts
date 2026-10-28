@@ -9,7 +9,7 @@ import { formatErrorResponse } from "@backend/utils/api-response";
 import { logError } from "@backend/utils/logger";
 
 /* Auth module imports */
-import { authRoutes } from "@backend/auth/routes/auth";
+import { authRoutes } from "@backend/routes/auth";
 
 /* Exported so an OpenAPI generator can read the mounted routes later */
 export const app = new Hono();

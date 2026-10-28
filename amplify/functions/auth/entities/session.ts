@@ -4,7 +4,7 @@
 import { Entity } from "electrodb";
 
 /* Backend module imports */
-import { TABLES, TABLE_INDEXES } from "@backend/constants/tables";
+import { TABLES, TABLE_INDEXES } from "@backend/constants/auth";
 import { dynamoDBClient } from "@backend/services/aws-clients";
 import { getISOString } from "@backend/utils/time-calculations";
 

@@ -21,7 +21,7 @@
     "skipLibCheck": true,
     /* Resolved by the bundler, so they work in handler code but not in the synth-time files backend.ts loads */
     "paths": {
-      "@backend/*": ["./functions/*"]
+      "@backend/*": ["./functions/auth/*"]
     }
   },
   "include": ["**/*.ts"],
