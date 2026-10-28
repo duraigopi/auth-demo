@@ -32,6 +32,7 @@ Adopted from the flash_css repo. Server-side rules there (Hono, AWS, Cognito, sh
 
 - Wrap every multi-property object literal onto multiple lines, even when short. Single-property literals may stay inline.
 - Use `!!value` for truthy checks, not explicit comparisons.
+- Destructure database results in every API handler: `const { data: user } = await UserEntity.get(...).go();`. For parallel reads use array destructuring, `const [{ data: session }, { data: user }] = await Promise.all([...]);`. Never read `result.data` afterwards or chain `.then((result) => result.data)`.
 - Use Chakra's `<Show when={...}>` for conditional rendering, not `&&`.
 - Format `useMemo` / `useCallback` with the closing parenthesis and dependency array on the same line.
 - Never use the array index as a list `key`. Use a unique id, or combine stable fields.

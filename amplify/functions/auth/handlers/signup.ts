@@ -1,0 +1,43 @@
+/* Library imports */
+import { nanoid } from "nanoid";
+
+/* Backend module imports */
+import { ERROR_CODES } from "@backend/constants/error-messages";
+import { USER_ROLE } from "@backend/constants/user";
+import { UserEntity } from "@backend/entities/user";
+import { formatErrorResponse, formatSuccessResponse } from "@backend/utils/api-response";
+import { hashPassword } from "@backend/utils/password";
+import { toPublicUser } from "@backend/utils/user";
+import type { ValidatedJsonContext } from "@backend/types/api";
+import type { SignupFormData } from "@backend/types/auth";
+
+export const signup = async (c: ValidatedJsonContext<SignupFormData>) => {
+  const { name, email, password } = c.req.valid("json");
+
+  /* Not atomic, since an index cannot enforce uniqueness, so two simultaneous signups could both pass */
+  const { data: existing } = await UserEntity.query.byEmail({ email }).go();
+  if (existing.length > 0) {
+    const response = formatErrorResponse({
+      message: "An account with this email already exists. Please log in instead.",
+      error: ERROR_CODES.EMAIL_EXISTS,
+    });
+    return c.json(response, 409);
+  }
+
+  const passwordHash = await hashPassword(password);
+
+  /* Role is fixed here and never read from the request, so nobody can sign up as an admin */
+  const { data: created } = await UserEntity.create({
+    user_id: nanoid(),
+    email,
+    name,
+    password_hash: passwordHash,
+    role: USER_ROLE.CLIENT,
+  }).go();
+
+  const response = formatSuccessResponse({
+    message: "Account created successfully.",
+    data: toPublicUser(created),
+  });
+  return c.json(response, 201);
+};

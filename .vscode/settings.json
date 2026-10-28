@@ -5,5 +5,5 @@
     "**/.amplify/**": true
   },
   "git.autoRepositoryDetection": false,
-  "git.untrackedChanges": "separate"
+  "git.untrackedChanges": "mixed"
 }

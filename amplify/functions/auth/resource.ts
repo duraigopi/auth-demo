@@ -1,4 +1,5 @@
 /* Library imports */
+import "dotenv/config";
 import { defineFunction } from "@aws-amplify/backend";
 
 export const authFunction = defineFunction({
@@ -6,4 +7,8 @@ export const authFunction = defineFunction({
   entry: "handler.ts",
   timeoutSeconds: 30,
   runtime: 24,
+  environment: {
+    /* Read from .env while the backend is built, then validated again when the Lambda starts */
+    JWT_SECRET: process.env.JWT_SECRET ?? "",
+  },
 });

@@ -18,7 +18,7 @@ export const SessionEntity = new Entity(
     attributes: {
       /* Identity */
 
-      /* PK, generated session identifier carried inside the refresh token */
+      /* PK, generated session identifier carried inside both tokens */
       session_id: {
         type: "string",
         required: true,
@@ -30,8 +30,8 @@ export const SessionEntity = new Entity(
 
       /* Authentication */
 
-      /* Hash only, the refresh token itself is never stored */
-      refresh_token_hash: {
+      /* Id of the newest refresh token, so an older token stops working as soon as a new one is issued */
+      refresh_token: {
         type: "string",
         required: true,
       },
