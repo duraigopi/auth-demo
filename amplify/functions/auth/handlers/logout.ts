@@ -13,7 +13,8 @@ export const logout = async (c: Context<AuthEnv>) => {
 
   try {
     /* The refresh token stops working at once; the access token still lives until it expires, at most 15 minutes */
-    await SessionEntity.patch({ session_id: sessionId })
+    await SessionEntity
+      .patch({ session_id: sessionId })
       .set({ is_revoked: true })
       .go();
 

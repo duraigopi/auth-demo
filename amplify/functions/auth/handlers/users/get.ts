@@ -11,7 +11,11 @@ export const get = async (c: AuthValidatedContext<{ param: UserIdParam }>) => {
   const { userId } = c.req.valid("param");
 
   try {
-    const { data: user } = await UserEntity.get({ user_id: userId }).go();
+    const { data: user } = await UserEntity
+      .get({ user_id: userId })
+      .go({
+        attributes: ["user_id", "email", "name", "role", "is_active"],
+      });
     if (!user) {
       const response = formatErrorResponse({
         message: "The user was not found.",

@@ -12,7 +12,12 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
 
   try {
     /* A scan reads the whole table, so search and paging happen in memory, which is fine for a small demo list */
-    const { data: users } = await UserEntity.scan.go({ pages: "all" });
+    const { data: users } = await UserEntity
+      .scan
+      .go({
+        pages: "all",
+        attributes: ["user_id", "email", "name", "role", "is_active"],
+      });
 
     /* All filters in one pass; search covers the name and the email, which is stored lowercase */
     const searchTerm = search?.toLowerCase();

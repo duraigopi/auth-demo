@@ -12,7 +12,11 @@ export const update = async (c: AuthValidatedContext<{ param: UserIdParam; json:
   const changes = c.req.valid("json");
 
   try {
-    const { data: user } = await UserEntity.get({ user_id: userId }).go();
+    const { data: user } = await UserEntity
+      .get({ user_id: userId })
+      .go({
+        attributes: ["user_id"],
+      });
     if (!user) {
       const response = formatErrorResponse({
         message: "The user was not found.",
@@ -31,7 +35,8 @@ export const update = async (c: AuthValidatedContext<{ param: UserIdParam; json:
       return c.json(response, 400);
     }
 
-    await UserEntity.patch({ user_id: userId })
+    await UserEntity
+      .patch({ user_id: userId })
       .set(changes)
       .go();
 

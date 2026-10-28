@@ -19,7 +19,11 @@ export const remove = async (c: AuthValidatedContext<{ param: UserIdParam }>) =>
       return c.json(response, 400);
     }
 
-    const { data: user } = await UserEntity.get({ user_id: userId }).go();
+    const { data: user } = await UserEntity
+      .get({ user_id: userId })
+      .go({
+        attributes: ["user_id"],
+      });
     if (!user) {
       const response = formatErrorResponse({
         message: "The user was not found.",

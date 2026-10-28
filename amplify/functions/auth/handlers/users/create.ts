@@ -15,7 +15,9 @@ export const create = async (c: AuthValidatedContext<{ json: CreateUserFormData 
 
   try {
     /* Not atomic, since an index cannot enforce uniqueness, so two simultaneous requests could both pass */
-    const { data: existing } = await UserEntity.query.byEmail({ email }).go();
+    const { data: existing } = await UserEntity
+      .query.byEmail({ email })
+      .go({ attributes: ["user_id"] });
     if (existing.length > 0) {
       const response = formatErrorResponse({
         message: "An account with this email already exists.",

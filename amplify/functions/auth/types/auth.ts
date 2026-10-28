@@ -6,6 +6,7 @@ import type { z } from "zod/v4";
 import type { USER_ROLE } from "@backend/constants/auth";
 import type { UserEntity } from "@backend/entities/user";
 import type { loginSchema, refreshSchema, signupSchema } from "@backend/schemas/auth";
+import type { changePasswordSchema, updateProfileSchema } from "@backend/schemas/me";
 import type { listQuerySchema } from "@backend/schemas/query";
 import type { createUserSchema, updateUserSchema, userIdParamSchema, userListQuerySchema } from "@backend/schemas/user";
 
@@ -45,3 +46,9 @@ export type ListQueryParams = z.infer<typeof listQuerySchema>;
 
 /* Query params accepted by GET /users */
 export type UserListQueryParams = z.infer<typeof userListQuerySchema>;
+
+/* Own-profile edit request body, derived from the update-profile schema */
+export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
+
+/* Change-password request body, derived from the change-password schema */
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;

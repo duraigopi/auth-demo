@@ -31,8 +31,17 @@ export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
 
     /* Independent reads, so they run together; the consistent read makes sure a token that was just replaced is never accepted */
     const [{ data: session }, { data: user }] = await Promise.all([
-      SessionEntity.get({ session_id: String(payload.sid) }).go({ consistent: true }),
-      UserEntity.get({ user_id: String(payload.sub) }).go(),
+      SessionEntity
+        .get({ session_id: String(payload.sid) })
+        .go({
+          consistent: true,
+          attributes: ["session_id", "user_id", "refresh_token", "is_revoked", "ttl"],
+        }),
+      UserEntity
+        .get({ user_id: String(payload.sub) })
+        .go({
+          attributes: ["user_id", "email", "name", "role", "is_active"],
+        }),
     ]);
 
     if (
@@ -50,13 +59,15 @@ export const refresh = async (c: ValidatedJsonContext<RefreshFormData>) => {
     /* The swap only succeeds while the stored token id is still the one just checked, so two simultaneous refreshes cannot both win */
     const tokenId = nanoid();
     try {
-      await SessionEntity.patch({ session_id: session.session_id })
+      await SessionEntity
+        .patch({ session_id: session.session_id })
         .set({ refresh_token: tokenId })
         .where(({ refresh_token }, { eq }) => eq(refresh_token, session.refresh_token))
         .go();
     } catch {
       /* Someone else already used this token, so it may have been copied; the whole session is ended */
-      await SessionEntity.patch({ session_id: session.session_id })
+      await SessionEntity
+        .patch({ session_id: session.session_id })
         .set({ is_revoked: true })
         .go();
       return sessionEnded();

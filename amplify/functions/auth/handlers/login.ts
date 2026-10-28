@@ -22,8 +22,16 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
   try {
     /* Independent reads, so they run together instead of one after the other */
     const [{ data: attempt }, { data: users }] = await Promise.all([
-      LoginAttemptEntity.get({ email }).go(),
-      UserEntity.query.byEmail({ email }).go(),
+      LoginAttemptEntity
+        .get({ email })
+        .go({
+          attributes: ["locked_until"],
+        }),
+      UserEntity
+        .query.byEmail({ email })
+        .go({
+          attributes: ["user_id", "email", "name", "role", "is_active", "password_hash"],
+        }),
     ]);
     const user = users[0];
 
@@ -39,12 +47,14 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
     const isPasswordValid = user ? await verifyPassword(password, user.password_hash) : false;
     if (!user || !isPasswordValid) {
       /* Atomic add, so two simultaneous wrong passwords both count */
-      const { data: updated } = await LoginAttemptEntity.update({ email })
+      const { data: updated } = await LoginAttemptEntity
+        .update({ email })
         .add({ failed_count: 1 })
         .set({ ttl: addDaysToUnixTimestamp(AUTH_CONFIG.LOGIN_ATTEMPT_TTL_DAYS) })
         .go({ response: "all_new" });
       if ((updated.failed_count ?? 0) >= AUTH_CONFIG.MAX_FAILED_ATTEMPTS) {
-        await LoginAttemptEntity.update({ email })
+        await LoginAttemptEntity
+          .update({ email })
           .set({
             locked_until: addMinutesToISOString(AUTH_CONFIG.LOCKOUT_MINUTES),
             failed_count: 0,
