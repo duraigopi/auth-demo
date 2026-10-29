@@ -14,6 +14,7 @@ interface ToastConfig {
 type ToastType = "success" | "error" | "warning" | "info";
 
 const createToast = (type: ToastType, config: ToastConfig) => {
+  toaster.remove();
   toaster.create({
     closable: true,
     duration: 3000,
@@ -24,9 +25,7 @@ const createToast = (type: ToastType, config: ToastConfig) => {
 
 export const showSuccessToast = (config: ToastConfig) => createToast("success", config);
 
-/* Errors stay until dismissed unless a duration is set */
-export const showErrorToast = (config: ToastConfig) =>
-  createToast("error", { duration: Infinity, ...config });
+export const showErrorToast = (config: ToastConfig) => createToast("error", config);
 
 export const showWarningToast = (config: ToastConfig) => createToast("warning", config);
 
