@@ -87,6 +87,42 @@ const selectRecipe = defineSlotRecipe({
   },
 });
 
+/* Table variant for the users list: gradient header, striped rows, hover color */
+const tableRecipe = defineSlotRecipe({
+  slots: ["root", "header", "body", "row", "columnHeader", "cell"],
+  variants: {
+    variant: {
+      users: {
+        header: {
+          "& tr": { background: "linear-gradient(to right, #0067D8, #00B398)" },
+          /* First and last columns stay in view when the table scrolls sideways, solid colors match the gradient ends */
+          "& th:first-of-type": { position: "sticky", left: "0", zIndex: "1", bgColor: "#0067D8" },
+          "& th:last-of-type": { position: "sticky", right: "0", zIndex: "1", bgColor: "#00B398" },
+        },
+        columnHeader: {
+          py: "3",
+          fontSize: "xs",
+          fontWeight: "semibold",
+          textTransform: "uppercase",
+          letterSpacing: "wider",
+          color: "#FFFFFF",
+        },
+        body: {
+          "& tr:nth-of-type(odd)": { bgColor: "#FFFFFF" },
+          "& tr:nth-of-type(even)": { bgColor: "#EAF3FC" },
+          "& tr:hover": { bgColor: "#DCEBFA" },
+          /* Same pinned columns in the body, inherit keeps the row color */
+          "& td:first-of-type": { position: "sticky", left: "0", zIndex: "1", bgColor: "inherit" },
+          "& td:last-of-type": { position: "sticky", right: "0", zIndex: "1", bgColor: "inherit" },
+        },
+        cell: {
+          py: "3",
+        },
+      },
+    },
+  },
+});
+
 /* Shared dialog look */
 const dialogRecipe = defineSlotRecipe({
   slots: ["backdrop", "positioner", "content", "header", "body", "footer", "title", "description", "closeTrigger"],
@@ -150,6 +186,7 @@ const config = defineConfig({
     slotRecipes: {
       dialog: dialogRecipe,
       select: selectRecipe,
+      table: tableRecipe,
       field: fieldRecipe,
     },
   },

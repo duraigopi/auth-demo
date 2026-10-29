@@ -5,16 +5,18 @@ import { useState } from "react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useDebounceValue } from "usehooks-ts";
 import { Badge, Box, Button, Flex, Heading, Icon, IconButton, Show, Spinner, Stack, Table, Text } from "@chakra-ui/react";
-import { LuPencil, LuRefreshCw, LuRotateCcw, LuSearch, LuTrash2, LuUserCheck, LuUserPlus, LuUserX, LuUsers } from "react-icons/lu";
+import { LuRefreshCw, LuRotateCcw, LuSearch, LuUserPlus, LuUsers } from "react-icons/lu";
 
 /* Lib module imports */
 import { Avatar } from "@/components/ui/avatar";
+import { DataListItem, DataListRoot } from "@/components/ui/data-list";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
 import { getMeApi } from "@lib/api/me";
 import { deleteUserApi, disableUserApi, enableUserApi, listUsersApi } from "@lib/api/users";
 import { CreateUserDialog } from "@lib/components/create-user-dialog";
 import { EditUserDialog } from "@lib/components/edit-user-dialog";
+import { UserActions } from "@lib/components/user-actions";
 import type { PublicUser, UserListResponse, UserResponse } from "@lib/types/auth";
 
 /* Shared module imports */
@@ -114,12 +116,12 @@ export const UsersPage = () => {
   return (
     <Box>
       <Stack maxW="5xl" mx="auto" gap="6" p={["4", "8"]}>
-        <Flex justify="space-between" align="flex-end" gap="4" flexWrap="wrap">
+        <Flex justify="space-between" align="center" gap="4">
           <Stack gap="1" color="#FFFFFF">
             <Heading size="2xl">Users</Heading>
             <Text opacity="0.9">Everyone who has an account.</Text>
           </Stack>
-          <Button variant="primary" onClick={() => setCreateOpen(true)}>
+          <Button variant="primary" flexShrink="0" onClick={() => setCreateOpen(true)}>
             <LuUserPlus />
             Add User
           </Button>
@@ -191,34 +193,22 @@ export const UsersPage = () => {
                 </Show>
               }
             >
-              <Box border="1px solid" borderColor="#D6E4F5" rounded="xl" overflow="hidden">
+              <Box hideBelow="md" border="1px solid" borderColor="#D6E4F5" rounded="xl" overflow="hidden">
                 <ScrollableContainer orientation="horizontal">
-                  <Table.Root interactive minW="3xl">
+                  <Table.Root variant="users" minW="3xl">
                     <Table.Header>
-                      <Table.Row bgGradient="to-r" gradientFrom="#0067D8" gradientTo="#00B398">
+                      <Table.Row>
                         {["Name", "Email", "Role", "Status", "Created At", "Actions"].map((heading) => (
-                          <Table.ColumnHeader
-                            key={heading}
-                            py="3"
-                            fontSize="xs"
-                            fontWeight="semibold"
-                            textTransform="uppercase"
-                            letterSpacing="wider"
-                            color="#FFFFFF"
-                          >
+                          <Table.ColumnHeader key={heading}>
                             {heading}
                           </Table.ColumnHeader>
                         ))}
                       </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                      {users?.map((user, index) => (
-                        <Table.Row
-                          key={user.user_id}
-                          bg={index % 2 ? "#EAF3FC" : "#FFFFFF"}
-                          _hover={{ bg: "#DCEBFA" }}
-                        >
-                          <Table.Cell py="3">
+                      {users?.map((user) => (
+                        <Table.Row key={user.user_id}>
+                          <Table.Cell>
                             <Flex align="center" gap="3">
                               <Avatar size="sm" name={user.name} bg="#0067D8" color="#FFFFFF" />
                               <Text fontWeight="medium">{user.name}</Text>
@@ -237,51 +227,13 @@ export const UsersPage = () => {
                             {formatDisplayDate(user.created_at)}
                           </Table.Cell>
                           <Table.Cell>
-                            <Flex gap="1">
-                              <Tooltip content="Edit user">
-                                <IconButton
-                                  aria-label="Edit user"
-                                  size="xs"
-                                  variant="ghost"
-                                  color="#0067D8"
-                                  onClick={() => setEditUser(user)}
-                                >
-                                  <LuPencil />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip
-                                content={
-                                  user.user_id === me?.user_id
-                                    ? "You can't change your own status"
-                                    : user.is_active
-                                      ? "Disable user"
-                                      : "Enable user"
-                                }
-                              >
-                                <IconButton
-                                  aria-label={user.is_active ? "Disable user" : "Enable user"}
-                                  disabled={user.user_id === me?.user_id}
-                                  size="xs"
-                                  variant="ghost"
-                                  color={user.is_active ? "orange.600" : "green.600"}
-                                  onClick={() => (user.is_active ? setDisableTarget(user) : setEnableTarget(user))}
-                                >
-                                  {user.is_active ? <LuUserX /> : <LuUserCheck />}
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip content={user.user_id === me?.user_id ? "You can't delete your own account" : "Delete user"}>
-                                <IconButton
-                                  aria-label="Delete user"
-                                  disabled={user.user_id === me?.user_id}
-                                  size="xs"
-                                  variant="ghost"
-                                  color="red.600"
-                                  onClick={() => setDeleteUser(user)}
-                                >
-                                  <LuTrash2 />
-                                </IconButton>
-                              </Tooltip>
-                            </Flex>
+                            <UserActions
+                              user={user}
+                              currentUserId={me?.user_id}
+                              onEdit={setEditUser}
+                              onToggleStatus={(target) => (target.is_active ? setDisableTarget(target) : setEnableTarget(target))}
+                              onDelete={setDeleteUser}
+                            />
                           </Table.Cell>
                         </Table.Row>
                       ))}
@@ -289,6 +241,46 @@ export const UsersPage = () => {
                   </Table.Root>
                 </ScrollableContainer>
               </Box>
+
+              {/* Phones get one card per user instead of the table */}
+              <Stack hideFrom="md" gap="3">
+                {users?.map((user) => (
+                  <Box key={user.user_id} bg="#FFFFFF" border="1px solid" borderColor="#D6E4F5" rounded="xl" p="4">
+                    <Flex justify="space-between" align="center" gap="2">
+                      <Flex align="center" gap="3" minW="0">
+                        <Avatar size="sm" name={user.name} bg="#0067D8" color="#FFFFFF" />
+                        <Stack gap="0" minW="0">
+                          <Text fontWeight="medium" truncate>
+                            {user.name}
+                          </Text>
+                          <Text fontSize="sm" color="gray.600" truncate>
+                            {user.email}
+                          </Text>
+                        </Stack>
+                      </Flex>
+                      <UserActions
+                        user={user}
+                        currentUserId={me?.user_id}
+                        onEdit={setEditUser}
+                        onToggleStatus={(target) => (target.is_active ? setDisableTarget(target) : setEnableTarget(target))}
+                        onDelete={setDeleteUser}
+                      />
+                    </Flex>
+                    <DataListRoot orientation="horizontal" size="sm" mt="3">
+                      <DataListItem label="Role" value={<Badge variant={user.role}>{user.role}</Badge>} />
+                      <DataListItem
+                        label="Status"
+                        value={
+                          <Badge variant={user.is_active ? "active" : "inactive"}>
+                            {user.is_active ? "Active" : "Inactive"}
+                          </Badge>
+                        }
+                      />
+                      <DataListItem label="Created At" value={formatDisplayDate(user.created_at)} />
+                    </DataListRoot>
+                  </Box>
+                ))}
+              </Stack>
 
               <PaginationBar
                 page={page}
