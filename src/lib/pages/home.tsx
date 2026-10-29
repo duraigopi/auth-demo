@@ -12,6 +12,7 @@ import { UsersPage } from "@lib/pages/users";
 import type { UserResponse } from "@lib/types/auth";
 
 /* Shared module imports */
+import { AppErrorBoundary } from "@shared/components/app-error-boundary";
 import { ScrollableContainer } from "@shared/components/scrollable-container";
 import { useApiQuery } from "@shared/hooks/use-api-query";
 
@@ -36,9 +37,11 @@ export const HomePage = () => {
             </Flex>
           }
         >
-          <Show when={me?.role === USER_ROLES.ADMIN} fallback={me ? <ClientHomePage user={me} /> : null}>
-            <UsersPage />
-          </Show>
+          <AppErrorBoundary source="home" fullScreen={false}>
+            <Show when={me?.role === USER_ROLES.ADMIN} fallback={me ? <ClientHomePage user={me} /> : null}>
+              <UsersPage />
+            </Show>
+          </AppErrorBoundary>
         </Show>
       </ScrollableContainer>
     </Flex>

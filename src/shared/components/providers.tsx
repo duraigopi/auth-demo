@@ -9,6 +9,9 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Provider } from "@/components/ui/provider";
 import { Toaster } from "@/components/ui/toaster";
 
+/* Shared module imports */
+import { AppErrorBoundary } from "@shared/components/app-error-boundary";
+
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const [queryClient] = useState(
     () =>
@@ -27,7 +30,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
     <NuqsAdapter>
       <Provider>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <AppErrorBoundary source="app">{children}</AppErrorBoundary>
           <Toaster />
         </QueryClientProvider>
       </Provider>
