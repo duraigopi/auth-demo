@@ -2,8 +2,8 @@
 
 /* Library imports */
 import { useEffect, useState } from "react";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useDebounceValue } from "usehooks-ts";
+import { parseAsInteger, parseAsNumberLiteral, parseAsString, useQueryState } from "nuqs";
+import { useBoolean, useDebounceValue } from "usehooks-ts";
 import { Badge, Box, Button, Flex, Heading, Icon, IconButton, Show, Spinner, Stack, Table, Text } from "@chakra-ui/react";
 import { LuRefreshCw, LuRotateCcw, LuSearch, LuUserPlus, LuUsers } from "react-icons/lu";
 
@@ -23,6 +23,7 @@ import type { PublicUser, UserListResponse, UserResponse } from "@lib/types/auth
 import { ConfirmationDialog } from "@shared/components/confirmation-dialog";
 import { DateField } from "@shared/components/date-field";
 import { PAGE_SIZE_VALUES, PaginationBar } from "@shared/components/pagination-bar";
+import type { PageSize } from "@shared/components/pagination-bar";
 import { ScrollableContainer } from "@shared/components/scrollable-container";
 import { TextField } from "@shared/components/text-field";
 import { useApiMutation, useApiQuery } from "@shared/hooks/use-api-query";
@@ -30,19 +31,18 @@ import { formatDisplayDate } from "@shared/utils/time";
 
 export const UsersPage = () => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [limit, setLimit] = useQueryState("limit", parseAsInteger.withDefault(10));
+  const [limit, setLimit] = useQueryState("limit", parseAsNumberLiteral(PAGE_SIZE_VALUES).withDefault(10));
   const [search, setSearch] = useQueryState("search", parseAsString.withDefault(""));
   const [from, setFrom] = useQueryState("from", parseAsString.withDefault(""));
   const [to, setTo] = useQueryState("to", parseAsString.withDefault(""));
   const [debouncedSearch] = useDebounceValue(search, 300);
 
-  /* A hand-edited URL can hold a bad page or size, so fall back to safe values */
+  /* A page below 1 in the URL is treated as the first page */
   const currentPage = Math.max(page, 1);
-  const currentLimit = PAGE_SIZE_VALUES.includes(limit) ? limit : 10;
 
   const { data: users, pagination, isLoading, isFetching, refetch } = useApiQuery<UserListResponse>({
-    queryKey: ["users", currentPage, currentLimit, debouncedSearch, from, to],
-    queryFn: () => listUsersApi({ page: currentPage, limit: currentLimit, search: debouncedSearch, from, to }),
+    queryKey: ["users", currentPage, limit, debouncedSearch, from, to],
+    queryFn: () => listUsersApi({ page: currentPage, limit, search: debouncedSearch, from, to }),
     keepPreviousData: true,
   });
 
@@ -57,7 +57,7 @@ export const UsersPage = () => {
     queryFn: getMeApi,
   });
 
-  const [createOpen, setCreateOpen] = useState(false);
+  const { value: createOpen, setTrue: openCreate, setFalse: closeCreate } = useBoolean(false);
   const [editUser, setEditUser] = useState<PublicUser | null>(null);
   const [deleteUser, setDeleteUser] = useState<PublicUser | null>(null);
 
@@ -117,7 +117,7 @@ export const UsersPage = () => {
     setPage(1);
   };
 
-  const onPageSizeChange = (value: number) => {
+  const onPageSizeChange = (value: PageSize) => {
     setLimit(value);
     setPage(1);
   };
@@ -130,7 +130,7 @@ export const UsersPage = () => {
             <Heading size="2xl">Users</Heading>
             <Text opacity="0.9">Everyone who has an account.</Text>
           </Stack>
-          <Button variant="primary" flexShrink="0" onClick={() => setCreateOpen(true)}>
+          <Button variant="primary" flexShrink="0" onClick={openCreate}>
             <LuUserPlus />
             Add User
           </Button>
@@ -172,7 +172,7 @@ export const UsersPage = () => {
           <Show
             when={!isLoading}
             fallback={
-              <Flex justify="center" align="center" minH="xs">
+              <Flex justify="center" align="center" minH={["40", "xs"]}>
                 <Spinner />
               </Flex>
             }
@@ -255,18 +255,44 @@ export const UsersPage = () => {
               <Stack hideFrom="md" gap="3">
                 {users?.map((user) => (
                   <Box key={user.user_id} bg="#FFFFFF" border="1px solid" borderColor="#D6E4F5" rounded="xl" p="4">
-                    <Flex justify="space-between" align="center" gap="2">
-                      <Flex align="center" gap="3" minW="0">
-                        <Avatar size="sm" name={user.name} bg="#0067D8" color="#FFFFFF" />
-                        <Stack gap="0" minW="0">
-                          <Text fontWeight="medium" truncate>
-                            {user.name}
-                          </Text>
-                          <Text fontSize="sm" color="gray.600" truncate>
-                            {user.email}
-                          </Text>
-                        </Stack>
-                      </Flex>
+                    <Flex align="center" gap="3" minW="0">
+                      <Avatar size="sm" name={user.name} bg="#0067D8" color="#FFFFFF" />
+                      <Stack gap="0" minW="0">
+                        <Text fontWeight="medium" overflowWrap="anywhere">
+                          {user.name}
+                        </Text>
+                        <Text fontSize="sm" color="gray.600" overflowWrap="anywhere">
+                          {user.email}
+                        </Text>
+                      </Stack>
+                    </Flex>
+                    <DataListRoot orientation="horizontal" size="sm" mt="3">
+                      {/* Label on the left, value on the right, so every row lines up on a narrow card */}
+                      <DataListItem
+                        label="Role"
+                        value={<Badge variant={user.role}>{user.role}</Badge>}
+                        justifyContent="space-between"
+                        alignItems="center"
+                      />
+                      <DataListItem
+                        label="Status"
+                        value={
+                          <Badge variant={user.is_active ? "active" : "inactive"}>
+                            {user.is_active ? "Active" : "Inactive"}
+                          </Badge>
+                        }
+                        justifyContent="space-between"
+                        alignItems="center"
+                      />
+                      <DataListItem
+                        label="Created At"
+                        value={formatDisplayDate(user.created_at)}
+                        justifyContent="space-between"
+                        alignItems="center"
+                      />
+                    </DataListRoot>
+                    {/* Actions get their own row so the name and email keep the full width */}
+                    <Flex justify="flex-end" mt="3" pt="2" borderTop="1px solid" borderColor="#E3EDF8">
                       <UserActions
                         user={user}
                         currentUserId={me?.user_id}
@@ -275,25 +301,13 @@ export const UsersPage = () => {
                         onDelete={setDeleteUser}
                       />
                     </Flex>
-                    <DataListRoot orientation="horizontal" size="sm" mt="3">
-                      <DataListItem label="Role" value={<Badge variant={user.role}>{user.role}</Badge>} />
-                      <DataListItem
-                        label="Status"
-                        value={
-                          <Badge variant={user.is_active ? "active" : "inactive"}>
-                            {user.is_active ? "Active" : "Inactive"}
-                          </Badge>
-                        }
-                      />
-                      <DataListItem label="Created At" value={formatDisplayDate(user.created_at)} />
-                    </DataListRoot>
                   </Box>
                 ))}
               </Stack>
 
               <PaginationBar
                 page={currentPage}
-                pageSize={currentLimit}
+                pageSize={limit}
                 count={pagination?.total ?? 0}
                 onPageChange={setPage}
                 onPageSizeChange={onPageSizeChange}
@@ -303,7 +317,7 @@ export const UsersPage = () => {
         </Box>
       </Stack>
 
-      <CreateUserDialog open={createOpen} onClose={() => setCreateOpen(false)} />
+      <CreateUserDialog open={createOpen} onClose={closeCreate} />
       <EditUserDialog user={editUser} currentUserId={me?.user_id} onClose={() => setEditUser(null)} />
       <ConfirmationDialog
         open={!!deleteUser}

@@ -11,7 +11,7 @@ export interface AuthLayoutProps {
 
 export const AuthLayout = ({ title, subtitle, children }: AuthLayoutProps) => (
   <Flex
-    minH="100vh"
+    minH="100dvh"
     direction="column"
     align="center"
     justify="center"
@@ -22,7 +22,7 @@ export const AuthLayout = ({ title, subtitle, children }: AuthLayoutProps) => (
       <Heading size="3xl">{title}</Heading>
       <Text>{subtitle}</Text>
     </Stack>
-    <Box w="full" maxW="md" bg="#FFFFFF" rounded="3xl" shadow="2xl" p="8">
+    <Box w="full" maxW="md" bg="#FFFFFF" rounded="3xl" shadow="2xl" p={["6", "8"]}>
       {children}
     </Box>
   </Flex>

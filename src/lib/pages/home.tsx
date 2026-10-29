@@ -25,14 +25,14 @@ export const HomePage = () => {
 
   return (
     /* Fixed height so only the content area scrolls */
-    <Flex direction="column" h="100vh">
+    <Flex direction="column" h="100dvh">
       <Header />
       <ScrollableContainer flex="1" minH="0">
         <Show
           when={!isLoading}
           fallback={
             /* Center the spinner below the 4rem header */
-            <Flex justify="center" align="center" minH="calc(100vh - 4rem)">
+            <Flex justify="center" align="center" minH="calc(100dvh - 4rem)">
               <Spinner color="#FFFFFF" size="lg" />
             </Flex>
           }

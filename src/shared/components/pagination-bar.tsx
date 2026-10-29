@@ -7,16 +7,19 @@ import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 /* Shared module imports */
 import { SelectField } from "@shared/components/select-field";
 
+/* The rows-per-page choices, also the only values the page URL accepts */
+export const PAGE_SIZE_VALUES = [5, 10, 25, 50] as const;
+
+export type PageSize = (typeof PAGE_SIZE_VALUES)[number];
+
 /* Props for the pagination bar */
 export interface PaginationBarProps {
   page: number;
   pageSize: number;
   count: number;
   onPageChange: (page: number) => void;
-  onPageSizeChange: (pageSize: number) => void;
+  onPageSizeChange: (pageSize: PageSize) => void;
 }
-
-export const PAGE_SIZE_VALUES = [5, 10, 25, 50];
 
 const PAGE_SIZES = PAGE_SIZE_VALUES.map((size) => ({ label: String(size), value: size }));
 
@@ -28,8 +31,9 @@ export const PaginationBar = ({ page, pageSize, count, onPageChange, onPageSizeC
       page={page}
       onPageChange={(details) => onPageChange(details.page)}
     >
-      <Flex justify="space-between" align="center" mt="4" gap="3" flexWrap="wrap">
-        <Flex align="center" gap="4" flexWrap="wrap">
+      {/* Phones stack the info above the page buttons and center both */}
+      <Flex direction={["column", "row"]} justify={["center", "space-between"]} align="center" mt="4" gap="3" flexWrap="wrap">
+        <Flex align="center" justify="center" gap="4" flexWrap="wrap">
           <Pagination.PageText format="long" fontSize="sm" color="gray.600" />
           <Flex align="center" gap="2">
             <Text fontSize="sm" color="gray.600" whiteSpace="nowrap">
@@ -41,7 +45,7 @@ export const PaginationBar = ({ page, pageSize, count, onPageChange, onPageSizeC
                 aria-label="Rows per page"
                 value={String(pageSize)}
                 options={PAGE_SIZES}
-                onChange={(value) => onPageSizeChange(Number(value))}
+                onChange={(value) => onPageSizeChange(Number(value) as PageSize)}
               />
             </Box>
           </Flex>
@@ -49,7 +53,7 @@ export const PaginationBar = ({ page, pageSize, count, onPageChange, onPageSizeC
 
         {/* No page buttons when there is only one page */}
         <Show when={count > pageSize}>
-          <ButtonGroup attached size="sm">
+          <ButtonGroup attached size={["xs", "sm"]}>
             <Pagination.PrevTrigger asChild>
               <IconButton aria-label="Previous page" variant="pagination">
                 <LuChevronLeft />

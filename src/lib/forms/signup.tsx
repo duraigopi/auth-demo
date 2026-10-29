@@ -39,7 +39,7 @@ export const SignupForm = ({ mode = "signup" }: SignupFormProps) => {
     },
   });
 
-  const { mutate: signup, isLoading: isSigningUp } = useApiMutation<UserResponse, SignupRequestBody>({
+  const { mutate: signup, isLoading: isSigningUp, isSuccess: isSignedUp } = useApiMutation<UserResponse, SignupRequestBody>({
     mutationFn: signupApi,
     successTitle: "Account Created Successfully",
     successDescription: "You can log in now.",
@@ -47,7 +47,7 @@ export const SignupForm = ({ mode = "signup" }: SignupFormProps) => {
     onSuccess: () => router.push("/auth/login"),
   });
 
-  const { mutate: setupAdmin, isLoading: isSettingUp } = useApiMutation<undefined, SignupRequestBody>({
+  const { mutate: setupAdmin, isLoading: isSettingUp, isSuccess: isSetUp } = useApiMutation<undefined, SignupRequestBody>({
     mutationFn: setupAdminApi,
     successTitle: "Admin Created Successfully",
     successDescription: "You can log in now.",
@@ -130,13 +130,14 @@ export const SignupForm = ({ mode = "signup" }: SignupFormProps) => {
           )}
         />
 
-        <Button type="submit" variant="primary" size="lg" loading={isSigningUp || isSettingUp}>
+        {/* Stays loading after success until the page changes */}
+        <Button type="submit" variant="primary" size="lg" loading={isSigningUp || isSettingUp || isSignedUp || isSetUp}>
           {mode === "setup" ? "Create admin" : "Sign up"}
         </Button>
 
         <Text textAlign="center" fontSize="sm">
           Already have an account?{" "}
-          <Link asChild>
+          <Link asChild color="#0067D8" fontWeight="semibold" _hover={{ color: "#0052AD", textDecoration: "underline" }}>
             <NextLink href="/auth/login" prefetch={false}>Log in</NextLink>
           </Link>
         </Text>

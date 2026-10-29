@@ -46,7 +46,7 @@ export const LoginForm = () => {
     }
   }, []);
 
-  const { mutate: login, isLoading } = useApiMutation<LoginResponse, LoginFormData>({
+  const { mutate: login, isLoading, isSuccess } = useApiMutation<LoginResponse, LoginFormData>({
     mutationFn: loginApi,
     successTitle: "Logged In Successfully",
     successDescription: "Welcome back.",
@@ -96,13 +96,14 @@ export const LoginForm = () => {
           )}
         />
 
-        <Button type="submit" variant="primary" size="lg" loading={isLoading}>
+        {/* Stays loading after success until the page changes */}
+        <Button type="submit" variant="primary" size="lg" loading={isLoading || isSuccess}>
           Log in
         </Button>
 
         <Text textAlign="center" fontSize="sm">
           Don&apos;t have an account?{" "}
-          <Link asChild>
+          <Link asChild color="#0067D8" fontWeight="semibold" _hover={{ color: "#0052AD", textDecoration: "underline" }}>
             <NextLink href="/auth/signup" prefetch={false}>Sign up</NextLink>
           </Link>
         </Text>

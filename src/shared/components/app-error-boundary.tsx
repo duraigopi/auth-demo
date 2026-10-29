@@ -20,7 +20,7 @@ export const AppErrorBoundary = ({ source, fullScreen = true, children }: AppErr
       console.error(`[App] Render failed in ${source}:`, error instanceof Error ? error.message : "Unknown error");
     }}
     fallbackRender={({ resetErrorBoundary }) => (
-      <Flex justify="center" align="center" minH={fullScreen ? "100vh" : "xs"} p="4">
+      <Flex justify="center" align="center" minH={fullScreen ? "100dvh" : "xs"} p="4">
         <Stack align="center" gap="4" bg="#FFFFFF" rounded="2xl" shadow="xl" p="8" maxW="md" textAlign="center">
           <Icon boxSize="10" color="#DC2626">
             <LuTriangleAlert />

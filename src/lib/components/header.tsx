@@ -1,8 +1,8 @@
 "use client";
 
 /* Library imports */
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useBoolean } from "usehooks-ts";
 import { Box, Flex, Heading, Icon, Skeleton } from "@chakra-ui/react";
 import { LuShieldCheck } from "react-icons/lu";
 
@@ -21,22 +21,30 @@ import { clearTokens } from "@shared/utils/token-storage";
 /* Top bar with the app name and the profile avatar */
 export const Header = () => {
   const router = useRouter();
-  const [profileOpen, setProfileOpen] = useState(false);
+  const { value: profileOpen, setValue: setProfileOpen, setTrue: openProfile, setFalse: closeProfile } = useBoolean(false);
+  const { value: isLoggingOut, setTrue: startLogout, setFalse: endLogout } = useBoolean(false);
   const { data: me, isLoading } = useApiQuery<UserResponse>({
     queryKey: ["me"],
     queryFn: getMeApi,
   });
 
   const onLogout = async () => {
-    /* Clear the tokens even if the logout call fails */
-    await logoutApi();
-    clearTokens();
-    setProfileOpen(false);
-    showSuccessToast({
-      title: "Signed Out",
-      description: "You have been successfully logged out.",
-    });
-    router.push("/auth/login");
+    if (isLoggingOut) return;
+    startLogout();
+
+    try {
+      /* Clear the tokens even if the logout call fails */
+      await logoutApi();
+      clearTokens();
+      closeProfile();
+      showSuccessToast({
+        title: "Signed Out",
+        description: "You have been successfully logged out.",
+      });
+      router.push("/auth/login");
+    } finally {
+      endLogout();
+    }
   };
 
   return (
@@ -66,7 +74,7 @@ export const Header = () => {
           rounded="full"
           cursor="pointer"
           _hover={{ opacity: 0.85 }}
-          onClick={() => setProfileOpen(true)}
+          onClick={openProfile}
         >
           <Skeleton loading={isLoading} rounded="full">
             <Avatar size="md" name={me?.name} bg="#00B398" color="#FFFFFF" />
@@ -74,7 +82,14 @@ export const Header = () => {
         </Box>
       </Flex>
 
-      <ProfileDialog key={me?.user_id} user={me} open={profileOpen} onOpenChange={setProfileOpen} onLogout={onLogout} />
+      <ProfileDialog
+        key={me?.user_id}
+        user={me}
+        open={profileOpen}
+        isLoggingOut={isLoggingOut}
+        onOpenChange={setProfileOpen}
+        onLogout={onLogout}
+      />
     </Box>
   );
 };

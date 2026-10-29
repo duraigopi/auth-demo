@@ -170,7 +170,7 @@ const config = defineConfig({
     body: {
       bg: "linear-gradient(to bottom, #0067D8, #00B398)",
       backgroundAttachment: "fixed",
-      minH: "100vh",
+      minH: "100dvh",
     },
     "::selection": {
       bg: "#0067D8",

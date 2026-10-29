@@ -5,7 +5,7 @@ export const emailField = z
   .string()
   .min(1, "Please enter your email address")
   .max(254, "Please enter an email address less than 254 characters")
-  .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address");
+  .pipe(z.email("Please enter a valid email address"));
 
 export const nameField = z
   .string()

@@ -23,11 +23,13 @@ import { showWarningToast } from "@shared/utils/notifications";
 export interface ProfileDialogProps {
   user: UserResponse | null;
   open: boolean;
+  /* Shows a spinner on the Log out button while the request runs */
+  isLoggingOut?: boolean;
   onOpenChange: (open: boolean) => void;
   onLogout: () => void;
 }
 
-export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDialogProps) => {
+export const ProfileDialog = ({ user, open, isLoggingOut = false, onOpenChange, onLogout }: ProfileDialogProps) => {
   const {
     control: profileControl,
     handleSubmit: handleProfileSubmit,
@@ -64,6 +66,7 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
     successTitle: "Profile Updated Successfully",
     successDescription: "Your name has been saved.",
     errorTitle: "Profile Update Failed",
+    onSuccess: () => onOpenChange(false),
   });
 
   const { mutate: savePassword, isLoading: isSavingPassword } = useApiMutation<undefined, ChangePasswordFormData>({
@@ -71,7 +74,10 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
     successTitle: "Password Changed Successfully",
     successDescription: "Your other sessions have been signed out.",
     errorTitle: "Password Change Failed",
-    onSuccess: () => resetPassword(),
+    onSuccess: () => {
+      resetPassword();
+      onOpenChange(false);
+    },
   });
 
   const onSaveProfile = handleProfileSubmit((data) => {
@@ -188,7 +194,7 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
               </Tabs.Root>
             </Dialog.Body>
             <Dialog.Footer justifyContent="space-between">
-              <Button variant="ghost" colorPalette="red" onClick={onLogout}>
+              <Button variant="ghost" colorPalette="red" loading={isLoggingOut} onClick={onLogout}>
                 <LuLogOut />
                 Log out
               </Button>

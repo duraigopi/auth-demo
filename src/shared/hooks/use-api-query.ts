@@ -1,6 +1,7 @@
 "use client";
 
 /* Library imports */
+import { useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /* Shared module imports */
@@ -108,7 +109,7 @@ export interface UseApiMutationReturn<TData, TVariables> {
   reset: () => void;
 }
 
-/* POST, PUT and DELETE hook, refreshes the given queries on success */
+/* POST, PUT and DELETE hook, refreshes the given queries when the request ends */
 export const useApiMutation = <TData, TVariables>({
   mutationKey,
   mutationFn,
@@ -122,6 +123,8 @@ export const useApiMutation = <TData, TVariables>({
   onError,
 }: UseApiMutationOptions<TData, TVariables>): UseApiMutationReturn<TData, TVariables> => {
   const queryClient = useQueryClient();
+  /* Two clicks in the same tick both see isPending as false, so this blocks the second one */
+  const inFlight = useRef(false);
 
   const mutation = useMutation<TData, ApiResponse<unknown>, TVariables>({
     mutationKey,
@@ -140,10 +143,6 @@ export const useApiMutation = <TData, TVariables>({
         showSuccessToast({ title: successTitle, description: successDescription });
       }
 
-      invalidateQueryKeys?.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
-      });
-
       onSuccess?.(data);
     },
     onError: (response) => {
@@ -153,12 +152,26 @@ export const useApiMutation = <TData, TVariables>({
 
       onError?.(response);
     },
+    onSettled: () => {
+      inFlight.current = false;
+
+      /* Also after a failure, the row may have been changed or removed by someone else */
+      invalidateQueryKeys?.forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
+    },
   });
+
+  const mutate = (variables: TVariables) => {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    mutation.mutate(variables);
+  };
 
   const errorResponse = mutation.error;
 
   return {
-    mutate: mutation.mutate,
+    mutate,
     mutateAsync: mutation.mutateAsync,
     data: mutation.data ?? null,
     isLoading: mutation.isPending,

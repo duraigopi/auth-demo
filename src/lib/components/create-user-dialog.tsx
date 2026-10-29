@@ -68,6 +68,7 @@ export const CreateUserDialog = ({ open, onClose }: CreateUserDialogProps) => {
       onConfirm={onSubmit}
     >
       <form onSubmit={onSubmit} noValidate>
+        <button type="submit" hidden />
         <Stack gap="4">
           <Controller
             name="name"
