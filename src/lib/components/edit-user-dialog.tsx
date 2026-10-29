@@ -8,7 +8,8 @@ import { Stack } from "@chakra-ui/react";
 import { LuUser } from "react-icons/lu";
 
 /* Lib module imports */
-import { updateMockUserApi } from "@lib/mock/users";
+import { updateUserApi } from "@lib/api/users";
+import { USER_ROLES } from "@lib/constants/auth";
 import { editUserSchema } from "@lib/schema/users";
 import type { EditUserFormData, PublicUser } from "@lib/types/auth";
 
@@ -25,8 +26,8 @@ export interface EditUserDialogProps {
 }
 
 const ROLES = [
-  { label: "Admin", value: "ADMIN" },
-  { label: "Client", value: "CLIENT" },
+  { label: "Admin", value: USER_ROLES.ADMIN },
+  { label: "Client", value: USER_ROLES.CLIENT },
 ];
 
 export const EditUserDialog = ({ user, onClose }: EditUserDialogProps) => {
@@ -34,7 +35,7 @@ export const EditUserDialog = ({ user, onClose }: EditUserDialogProps) => {
     resolver: zodResolver(editUserSchema),
     defaultValues: {
       name: "",
-      role: "CLIENT",
+      role: USER_ROLES.CLIENT,
     },
   });
 
@@ -44,7 +45,7 @@ export const EditUserDialog = ({ user, onClose }: EditUserDialogProps) => {
   }, [user, reset]);
 
   const { mutate: saveUser, isLoading } = useApiMutation<undefined, { userId: string; body: EditUserFormData }>({
-    mutationFn: ({ userId, body }) => updateMockUserApi(userId, body),
+    mutationFn: ({ userId, body }) => updateUserApi(userId, body),
     invalidateQueryKeys: [["users"]],
     successTitle: "User Updated Successfully",
     successDescription: "The changes have been saved.",

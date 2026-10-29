@@ -18,3 +18,11 @@ export const isISOExpired = (iso: string): boolean => isPast(parseISO(iso));
 
 /* Unix seconds for a time some minutes from now, used for the JWT exp claim */
 export const addMinutesToUnixTimestamp = (minutes: number): number => getUnixTime(addMinutes(new Date(), minutes));
+
+/* True when an ISO time falls inside the UTC day range, both days included; either end can be left out */
+export const isInDayRange = (iso: string, from?: string, to?: string): boolean => {
+  const time = parseISO(iso).getTime();
+  if (from && time < parseISO(`${from}T00:00:00.000Z`).getTime()) return false;
+  if (to && time > parseISO(`${to}T23:59:59.999Z`).getTime()) return false;
+  return true;
+};

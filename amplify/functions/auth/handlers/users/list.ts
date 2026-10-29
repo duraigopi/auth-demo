@@ -3,12 +3,13 @@ import { ERROR_CODES } from "@backend/constants/error-messages";
 import { UserEntity } from "@backend/entities/user";
 import { formatErrorResponse, formatSuccessResponse } from "@backend/utils/api-response";
 import { logError } from "@backend/utils/logger";
+import { isInDayRange } from "@backend/utils/time-calculations";
 import { toPublicUser } from "@backend/utils/user";
 import type { AuthValidatedContext } from "@backend/types/api";
 import type { UserListQueryParams } from "@backend/types/auth";
 
 export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams }>) => {
-  const { page, limit, search, role, is_active } = c.req.valid("query");
+  const { page, limit, search, role, is_active, from, to } = c.req.valid("query");
 
   try {
     /* Scans the whole table and filters in memory, fine for a small list */
@@ -24,6 +25,7 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
     const filteredUsers = users.filter((user) => {
       if (role && user.role !== role) return false;
       if (is_active !== undefined && user.is_active !== is_active) return false;
+      if (!isInDayRange(user.created_at, from, to)) return false;
       if (searchTerm && !user.name.toLowerCase().includes(searchTerm) && !user.email.includes(searchTerm)) return false;
       return true;
     });

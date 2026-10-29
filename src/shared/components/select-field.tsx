@@ -1,7 +1,6 @@
 "use client";
 
 /* Library imports */
-import { useMemo } from "react";
 import { Portal, Select, createListCollection } from "@chakra-ui/react";
 import type { SelectRootProps } from "@chakra-ui/react";
 
@@ -42,10 +41,9 @@ export const SelectField = ({
   disabled,
   "aria-label": ariaLabel,
 }: SelectFieldProps) => {
-  const collection = useMemo(
-    () => createListCollection({ items: options.map((option) => ({ label: option.label, value: String(option.value) })) }),
-    [options],
-  );
+  const collection = createListCollection({
+    items: options.map((option) => ({ label: option.label, value: String(option.value) })),
+  });
 
   return (
     <Field

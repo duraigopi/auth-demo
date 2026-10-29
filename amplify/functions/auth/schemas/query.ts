@@ -1,6 +1,9 @@
 /* Library imports */
 import { z } from "zod/v4";
 
+/* A calendar day as YYYY-MM-DD, used for the created-at range filter */
+const dayField = z.iso.date({ error: "Please provide a date as YYYY-MM-DD" });
+
 export const listQuerySchema = z.object({
   page: z.coerce
     .number({ message: "Please provide a valid page number" })
@@ -15,4 +18,6 @@ export const listQuerySchema = z.object({
     .max(100, { message: "Please provide a limit less than or equal to 100" })
     .default(20),
   search: z.string().trim().max(100, "Please enter up to 100 characters").optional(),
+  from: dayField.optional(),
+  to: dayField.optional(),
 });

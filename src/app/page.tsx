@@ -2,12 +2,12 @@
 import { Suspense } from "react";
 
 /* Lib module imports */
-import { UsersPage } from "@lib/pages/users";
+import { HomePage } from "@lib/pages/home";
 
-/* The page reads the URL query, so it needs a Suspense boundary */
+/* The users list reads the URL query, so the page needs a Suspense boundary */
 const Home = () => (
   <Suspense>
-    <UsersPage />
+    <HomePage />
   </Suspense>
 );
 
