@@ -92,7 +92,12 @@ export const ProfileDialog = ({ user, open, isLoggingOut = false, onOpenChange, 
   });
 
   return (
-    <Dialog.Root open={open} onOpenChange={(details) => onOpenChange(details.open)} placement="center">
+    <Dialog.Root
+      open={open}
+      onOpenChange={(details) => onOpenChange(details.open)}
+      placement="center"
+      scrollBehavior="inside"
+    >
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>

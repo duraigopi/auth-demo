@@ -38,6 +38,7 @@ export const ConfirmationDialog = ({
     onOpenChange={(details) => onOpenChange(details.open)}
     role="alertdialog"
     placement="center"
+    scrollBehavior="inside"
   >
     <Portal>
       <Dialog.Backdrop />
