@@ -7,6 +7,11 @@ export const emailField = z
   .max(254, "Please enter an email address less than 254 characters")
   .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address");
 
+export const nameField = z
+  .string()
+  .min(1, "Please enter the full name")
+  .max(100, "Please enter a name less than 100 characters");
+
 export const passwordField = z
   .string()
   .min(8, "Please enter a password with at least 8 characters")
@@ -26,10 +31,7 @@ export const loginSchema = z.object({
 
 export const signupSchema = z
   .object({
-    name: z
-      .string()
-      .min(1, "Please enter your full name")
-      .max(100, "Please enter a name less than 100 characters"),
+    name: nameField,
     email: emailField,
     password: passwordField,
     confirmPassword: z.string().min(1, "Please confirm your password"),

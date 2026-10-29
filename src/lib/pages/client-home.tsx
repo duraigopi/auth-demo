@@ -29,7 +29,7 @@ export const ClientHomePage = ({ user }: ClientHomePageProps) => {
   return (
     <Stack maxW="3xl" mx="auto" gap="6" p={["4", "8"]}>
       <Stack gap="1" color="#FFFFFF">
-        <Heading size="2xl">Welcome, {user?.name.split(" ")[0]}!</Heading>
+        <Heading size="2xl">Welcome, {user?.name}!</Heading>
         <Text opacity="0.9">Here are your account details. Use the profile icon at the top right to update them.</Text>
       </Stack>
 

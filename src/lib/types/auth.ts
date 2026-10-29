@@ -79,7 +79,6 @@ export interface UserListParams {
   page: number;
   limit: number;
   search?: string;
-  /* Created date range as YYYY-MM-DD, inclusive */
   from?: string;
   to?: string;
 }
