@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "deploy": "next build && npx wrangler pages deploy out --project-name auth-demo",
     "lint": "eslint",
     "typegen": "npx @chakra-ui/cli typegen src/theme.ts",
     "seed:users": "tsx --tsconfig amplify/tsconfig.json amplify/scripts/seed-users.ts"
