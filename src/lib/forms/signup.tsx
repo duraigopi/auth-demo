@@ -137,7 +137,7 @@ export const SignupForm = ({ mode = "signup" }: SignupFormProps) => {
         <Text textAlign="center" fontSize="sm">
           Already have an account?{" "}
           <Link asChild>
-            <NextLink href="/auth/login">Log in</NextLink>
+            <NextLink href="/auth/login" prefetch={false}>Log in</NextLink>
           </Link>
         </Text>
       </Stack>

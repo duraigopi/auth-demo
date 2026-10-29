@@ -103,7 +103,7 @@ export const LoginForm = () => {
         <Text textAlign="center" fontSize="sm">
           Don&apos;t have an account?{" "}
           <Link asChild>
-            <NextLink href="/auth/signup">Sign up</NextLink>
+            <NextLink href="/auth/signup" prefetch={false}>Sign up</NextLink>
           </Link>
         </Text>
       </Stack>
