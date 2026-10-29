@@ -43,24 +43,27 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
       return c.json(response, 429);
     }
 
-    /* An unknown email gets the same response as a wrong password, so emails can't be enumerated */
+    /* An unknown email gets the same response as a wrong password */
     const isPasswordValid = user ? await verifyPassword(password, user.password_hash) : false;
     if (!user || !isPasswordValid) {
-      /* Atomic increment so concurrent failures are all counted */
-      const { data: updated } = await LoginAttemptEntity
-        .update({ email })
-        .add({ failed_count: 1 })
-        .set({ ttl: addDaysToUnixTimestamp(AUTH_CONFIG.LOGIN_ATTEMPT_TTL_DAYS) })
-        .go({ response: "all_new" });
-      /* Lock the account once the limit is reached */
-      if ((updated.failed_count ?? 0) >= AUTH_CONFIG.MAX_FAILED_ATTEMPTS) {
-        await LoginAttemptEntity
+      /* No account means nothing to lock, so the attempt is only stored for real emails */
+      if (user) {
+        /* Atomic increment so concurrent failures are all counted */
+        const { data: updated } = await LoginAttemptEntity
           .update({ email })
-          .set({
-            locked_until: addMinutesToISOString(AUTH_CONFIG.LOCKOUT_MINUTES),
-            failed_count: 0,
-          })
-          .go();
+          .add({ failed_count: 1 })
+          .set({ ttl: addDaysToUnixTimestamp(AUTH_CONFIG.LOGIN_ATTEMPT_TTL_DAYS) })
+          .go({ response: "all_new" });
+        /* Lock the account once the limit is reached */
+        if ((updated.failed_count ?? 0) >= AUTH_CONFIG.MAX_FAILED_ATTEMPTS) {
+          await LoginAttemptEntity
+            .update({ email })
+            .set({
+              locked_until: addMinutesToISOString(AUTH_CONFIG.LOCKOUT_MINUTES),
+              failed_count: 0,
+            })
+            .go();
+        }
       }
       const response = formatErrorResponse({
         message: "Incorrect email or password. Please try again.",
@@ -81,8 +84,9 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
     const sessionId = nanoid();
     const tokenId = nanoid();
 
-    /* Clear the earlier failed attempts and create the session */
-    await Promise.all([
+    /* The tokens only need the ids made above, so they are signed while the database writes run */
+    const [, , accessToken, refreshToken] = await Promise.all([
+      /* Clear the earlier failed attempts */
       LoginAttemptEntity.delete({ email }).go(),
       SessionEntity.create({
         session_id: sessionId,
@@ -90,9 +94,6 @@ export const login = async (c: ValidatedJsonContext<LoginFormData>) => {
         refresh_token: tokenId,
         ttl: addDaysToUnixTimestamp(AUTH_CONFIG.SESSION_DAYS),
       }).go(),
-    ]);
-
-    const [accessToken, refreshToken] = await Promise.all([
       createAccessToken({
         userId: user.user_id,
         role: user.role,

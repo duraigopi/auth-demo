@@ -1,3 +1,6 @@
+/* Library imports */
+import { compareDesc } from "date-fns";
+
 /* Backend module imports */
 import { ERROR_CODES } from "@backend/constants/error-messages";
 import { UserEntity } from "@backend/entities/user";
@@ -29,6 +32,8 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
       if (searchTerm && !user.name.toLowerCase().includes(searchTerm) && !user.email.includes(searchTerm)) return false;
       return true;
     });
+
+    filteredUsers.sort((a, b) => compareDesc(a.created_at, b.created_at) || a.user_id.localeCompare(b.user_id));
 
     /* Take the requested page */
     const offset = (page - 1) * limit;

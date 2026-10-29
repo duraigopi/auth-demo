@@ -1,7 +1,7 @@
 /* Library imports */
 import { posix } from "path";
 import { defineBackend } from "@aws-amplify/backend";
-import { CfnOutput, RemovalPolicy } from "aws-cdk-lib";
+import { CfnOutput, Duration, RemovalPolicy } from "aws-cdk-lib";
 import { CorsHttpMethod, HttpApi } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
@@ -29,6 +29,7 @@ const httpApi = new HttpApi(apiStack, "auth-api", {
     allowOrigins: allowedOrigins,
     allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.POST, CorsHttpMethod.PUT, CorsHttpMethod.DELETE, CorsHttpMethod.OPTIONS],
     allowHeaders: ["Content-Type", "Authorization"],
+    maxAge: Duration.days(1),
   },
 });
 

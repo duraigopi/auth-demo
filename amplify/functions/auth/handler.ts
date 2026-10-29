@@ -38,6 +38,7 @@ app.use("*", cors({
   origin: CORS_ALLOWED_ORIGINS,
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowHeaders: CORS_ALLOWED_HEADERS,
+  maxAge: 86400,
 }));
 
 /* Security headers. This API only returns JSON, so the CSP can deny everything */
@@ -53,6 +54,12 @@ app.use("*", secureHeaders({
   referrerPolicy: "no-referrer",
   crossOriginResourcePolicy: "same-origin",
 }));
+
+/* Responses hold personal data and tokens, so browsers and proxies must not store them */
+app.use("*", async (c, next) => {
+  await next();
+  c.header("Cache-Control", "no-store");
+});
 
 /* Rejects request bodies above the size limit before anything parses them */
 app.use("*", bodyLimit({
