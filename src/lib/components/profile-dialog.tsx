@@ -17,6 +17,7 @@ import type { ChangePasswordFormData, ProfileFormData, UserResponse } from "@lib
 import { PasswordField } from "@shared/components/password-field";
 import { TextField } from "@shared/components/text-field";
 import { useApiMutation } from "@shared/hooks/use-api-query";
+import { showWarningToast } from "@shared/utils/notifications";
 
 /* Props for the profile dialog */
 export interface ProfileDialogProps {
@@ -27,14 +28,23 @@ export interface ProfileDialogProps {
 }
 
 export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDialogProps) => {
-  const profileForm = useForm<ProfileFormData>({
+  const {
+    control: profileControl,
+    handleSubmit: handleProfileSubmit,
+    reset: resetProfile,
+    formState: { isDirty: isProfileDirty },
+  } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: "",
     },
   });
 
-  const passwordForm = useForm<ChangePasswordFormData>({
+  const {
+    control: passwordControl,
+    handleSubmit: handlePasswordSubmit,
+    reset: resetPassword,
+  } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
       current_password: "",
@@ -45,8 +55,8 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
 
   /* Load the saved name when the dialog opens */
   useEffect(() => {
-    if (open && user) profileForm.reset({ name: user.name });
-  }, [open, user, profileForm]);
+    if (open && user) resetProfile({ name: user.name });
+  }, [open, user, resetProfile]);
 
   const { mutate: saveProfile, isLoading: isSavingProfile } = useApiMutation<undefined, ProfileFormData>({
     mutationFn: updateMeApi,
@@ -61,7 +71,18 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
     successTitle: "Password Changed Successfully",
     successDescription: "Your other sessions have been signed out.",
     errorTitle: "Password Change Failed",
-    onSuccess: () => passwordForm.reset(),
+    onSuccess: () => resetPassword(),
+  });
+
+  const onSaveProfile = handleProfileSubmit((data) => {
+    if (!isProfileDirty) {
+      showWarningToast({
+        title: "No Changes to Save",
+        description: "Please update your name before saving.",
+      });
+      return;
+    }
+    saveProfile(data);
   });
 
   return (
@@ -94,11 +115,11 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
                 </Tabs.List>
 
                 <Tabs.Content value="profile">
-                  <form onSubmit={profileForm.handleSubmit((data) => saveProfile(data))} noValidate>
+                  <form onSubmit={onSaveProfile} noValidate>
                     <Stack gap="4">
                       <Controller
                         name="name"
-                        control={profileForm.control}
+                        control={profileControl}
                         render={({ field, fieldState }) => (
                           <TextField
                             {...field}
@@ -117,11 +138,11 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
                 </Tabs.Content>
 
                 <Tabs.Content value="password">
-                  <form onSubmit={passwordForm.handleSubmit((data) => savePassword(data))} noValidate>
+                  <form onSubmit={handlePasswordSubmit((data) => savePassword(data))} noValidate>
                     <Stack gap="4">
                       <Controller
                         name="current_password"
-                        control={passwordForm.control}
+                        control={passwordControl}
                         render={({ field, fieldState }) => (
                           <PasswordField
                             {...field}
@@ -134,7 +155,7 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
                       />
                       <Controller
                         name="new_password"
-                        control={passwordForm.control}
+                        control={passwordControl}
                         render={({ field, fieldState }) => (
                           <PasswordField
                             {...field}
@@ -147,7 +168,7 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
                       />
                       <Controller
                         name="confirm_password"
-                        control={passwordForm.control}
+                        control={passwordControl}
                         render={({ field, fieldState }) => (
                           <PasswordField
                             {...field}

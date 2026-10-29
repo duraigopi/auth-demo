@@ -18,6 +18,7 @@ import { ConfirmationDialog } from "@shared/components/confirmation-dialog";
 import { SelectField } from "@shared/components/select-field";
 import { TextField } from "@shared/components/text-field";
 import { useApiMutation } from "@shared/hooks/use-api-query";
+import { showWarningToast } from "@shared/utils/notifications";
 
 /* Props for the edit user dialog */
 export interface EditUserDialogProps {
@@ -28,7 +29,7 @@ export interface EditUserDialogProps {
 }
 
 export const EditUserDialog = ({ user, currentUserId, onClose }: EditUserDialogProps) => {
-  const { control, handleSubmit, reset } = useForm<EditUserFormData>({
+  const { control, handleSubmit, reset, formState: { isDirty } } = useForm<EditUserFormData>({
     resolver: zodResolver(editUserSchema),
     defaultValues: {
       name: "",
@@ -51,7 +52,15 @@ export const EditUserDialog = ({ user, currentUserId, onClose }: EditUserDialogP
   });
 
   const onSubmit = handleSubmit((data) => {
-    if (user) saveUser({ userId: user.user_id, body: data });
+    if (!user) return;
+    if (!isDirty) {
+      showWarningToast({
+        title: "No Changes to Save",
+        description: "Please update the name or role before saving.",
+      });
+      return;
+    }
+    saveUser({ userId: user.user_id, body: data });
   });
 
   return (
