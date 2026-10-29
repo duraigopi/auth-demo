@@ -5,7 +5,6 @@ import type { Metadata } from "next";
 import { Providers } from "@shared/components/providers";
 
 export const metadata: Metadata = {
-  /* Pages set their own short title, the template adds the app name after it */
   title: "Auth Demo",
   description: "Log in, manage your profile, and manage users with role-based access.",
 };
