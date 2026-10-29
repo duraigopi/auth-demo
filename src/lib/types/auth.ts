@@ -5,7 +5,7 @@ import type { z } from "zod/v4";
 import type { USER_ROLES } from "@lib/constants/auth";
 import type { loginSchema, signupSchema } from "@lib/schema/auth";
 import type { changePasswordSchema, profileSchema } from "@lib/schema/profile";
-import type { editUserSchema } from "@lib/schema/users";
+import type { createUserSchema, editUserSchema } from "@lib/schema/users";
 
 /* Shared module imports */
 import type { AuthTokens } from "@shared/types/api";
@@ -18,6 +18,9 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 
 /* Signup form values */
 export type SignupFormData = z.infer<typeof signupSchema>;
+
+/* Add user form values */
+export type CreateUserFormData = z.infer<typeof createUserSchema>;
 
 /* Edit user form values */
 export type EditUserFormData = z.infer<typeof editUserSchema>;

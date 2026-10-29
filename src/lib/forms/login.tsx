@@ -18,10 +18,12 @@ import type { LoginFormData, LoginResponse } from "@lib/types/auth";
 import { PasswordField } from "@shared/components/password-field";
 import { TextField } from "@shared/components/text-field";
 import { useApiMutation } from "@shared/hooks/use-api-query";
+import { useRedirectIfLoggedIn } from "@shared/hooks/use-redirect-if-logged-in";
 import { getErrorMessages } from "@shared/utils/form";
 import { saveTokens } from "@shared/utils/token-storage";
 
 export const LoginForm = () => {
+  useRedirectIfLoggedIn();
   const router = useRouter();
   const { control, handleSubmit } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),

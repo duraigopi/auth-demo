@@ -18,10 +18,10 @@ export interface ClientHomePageProps {
 export const ClientHomePage = ({ user }: ClientHomePageProps) => {
   const details = [
     { label: "Email", value: user?.email },
-    { label: "Role", value: <Badge colorPalette="purple">{user?.role}</Badge> },
+    { label: "Role", value: <Badge variant={user?.role}>{user?.role}</Badge> },
     {
       label: "Status",
-      value: <Badge colorPalette={user?.is_active ? "green" : "red"}>{user?.is_active ? "Active" : "Inactive"}</Badge>,
+      value: <Badge variant={user?.is_active ? "active" : "inactive"}>{user?.is_active ? "Active" : "Inactive"}</Badge>,
     },
     { label: "Member Since", value: formatDisplayDate(user?.created_at) },
   ];

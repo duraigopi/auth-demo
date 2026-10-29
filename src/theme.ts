@@ -46,6 +46,18 @@ const fieldRecipe = defineSlotRecipe({
   },
 });
 
+/* Badge variants for the user roles (named like the role values) and the account status */
+const badgeRecipe = defineRecipe({
+  variants: {
+    variant: {
+      ADMIN: { bgColor: "#E6F0FB", color: "#0067D8" },
+      CLIENT: { bgColor: "#F3E8FF", color: "#7E22CE" },
+      active: { bgColor: "#DCFCE7", color: "#15803D" },
+      inactive: { bgColor: "#FEE2E2", color: "#B91C1C" },
+    },
+  },
+});
+
 /* Stronger input border, the default is too faint on light cards */
 const inputRecipe = defineRecipe({
   variants: {
@@ -131,6 +143,7 @@ const config = defineConfig({
   },
   theme: {
     recipes: {
+      badge: badgeRecipe,
       button: buttonRecipe,
       input: inputRecipe,
     },

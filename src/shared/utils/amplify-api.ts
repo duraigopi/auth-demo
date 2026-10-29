@@ -10,9 +10,13 @@ import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from "@share
 
 /* Point Amplify at the API from the outputs file */
 const configureAmplify = () => {
+  /* Configure from the outputs first, then add the REST API, or Amplify ignores the API key */
+  Amplify.configure(outputs);
+  const existingConfig = Amplify.getConfig();
   Amplify.configure({
-    ...outputs,
+    ...existingConfig,
     API: {
+      ...existingConfig.API,
       REST: outputs.custom.API,
     },
   });

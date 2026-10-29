@@ -8,3 +8,10 @@ export const USER_ROLES = {
 } as const;
 
 export const USER_ROLE_VALUES: UserRole[] = Object.values(USER_ROLES);
+
+/* Role choices for the select fields */
+export const USER_ROLE_CHOICES = [
+  { label: "Admin", value: USER_ROLES.ADMIN },
+  { label: "Client", value: USER_ROLES.CLIENT },
+];
+

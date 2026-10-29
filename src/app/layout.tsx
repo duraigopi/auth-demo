@@ -14,7 +14,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => (
     lang="en"
     suppressHydrationWarning
   >
-    <body>
+    <body suppressHydrationWarning>
       <Providers>{children}</Providers>
     </body>
   </html>

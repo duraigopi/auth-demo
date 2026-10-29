@@ -12,6 +12,13 @@ export const loginApi = (body: LoginFormData) =>
     unauth: true,
   });
 
+export const setupAdminApi = (body: SignupRequestBody) =>
+  amplifyPost<undefined>({
+    path: AUTH_ENDPOINTS.SETUP_ADMIN,
+    body,
+    unauth: true,
+  });
+
 export const signupApi = (body: SignupRequestBody) =>
   amplifyPost<UserResponse>({
     path: AUTH_ENDPOINTS.SIGNUP,

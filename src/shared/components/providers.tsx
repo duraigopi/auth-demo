@@ -24,11 +24,14 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
   );
 
   return (
-    <Provider>
-      <QueryClientProvider client={queryClient}>
-        <NuqsAdapter>{children}</NuqsAdapter>
-        <Toaster />
-      </QueryClientProvider>
-    </Provider>
+    /* Adapter stays outside Chakra so its hidden Suspense is first, ahead of Chakra's inline styles */
+    <NuqsAdapter>
+      <Provider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <Toaster />
+        </QueryClientProvider>
+      </Provider>
+    </NuqsAdapter>
   );
 };

@@ -15,6 +15,21 @@ export const setupAdmin = async (c: ValidatedJsonContext<SignupFormData>) => {
   const { name, email, password } = c.req.valid("json");
 
   try {
+    /* Only works until the first admin exists, after that admins are created by admins */
+    const { data: users } = await UserEntity
+      .scan
+      .go({
+        pages: "all",
+        attributes: ["role"],
+      });
+    if (users.some((user) => user.role === USER_ROLE.ADMIN)) {
+      const response = formatErrorResponse({
+        message: "Setup is already done. Ask an admin to create your account.",
+        error: ERROR_CODES.FORBIDDEN,
+      });
+      return c.json(response, 403);
+    }
+
     const { data: existing } = await UserEntity
       .query.byEmail({ email })
       .go({

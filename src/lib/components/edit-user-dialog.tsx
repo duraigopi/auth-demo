@@ -9,7 +9,7 @@ import { LuUser } from "react-icons/lu";
 
 /* Lib module imports */
 import { updateUserApi } from "@lib/api/users";
-import { USER_ROLES } from "@lib/constants/auth";
+import { USER_ROLE_CHOICES, USER_ROLES } from "@lib/constants/auth";
 import { editUserSchema } from "@lib/schema/users";
 import type { EditUserFormData, PublicUser } from "@lib/types/auth";
 
@@ -22,15 +22,12 @@ import { useApiMutation } from "@shared/hooks/use-api-query";
 /* Props for the edit user dialog */
 export interface EditUserDialogProps {
   user: PublicUser | null;
+  /* The signed-in user, who can't change their own role */
+  currentUserId?: string;
   onClose: () => void;
 }
 
-const ROLES = [
-  { label: "Admin", value: USER_ROLES.ADMIN },
-  { label: "Client", value: USER_ROLES.CLIENT },
-];
-
-export const EditUserDialog = ({ user, onClose }: EditUserDialogProps) => {
+export const EditUserDialog = ({ user, currentUserId, onClose }: EditUserDialogProps) => {
   const { control, handleSubmit, reset } = useForm<EditUserFormData>({
     resolver: zodResolver(editUserSchema),
     defaultValues: {
@@ -88,7 +85,9 @@ export const EditUserDialog = ({ user, onClose }: EditUserDialogProps) => {
               <SelectField
                 label="Role"
                 value={field.value}
-                options={ROLES}
+                options={USER_ROLE_CHOICES}
+                disabled={!!user && user.user_id === currentUserId}
+                helperText={user?.user_id === currentUserId ? "You can't change your own role" : undefined}
                 onChange={field.onChange}
                 errorMessage={fieldState.error?.message}
               />

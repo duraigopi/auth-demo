@@ -36,7 +36,7 @@ export const HomePage = () => {
             </Flex>
           }
         >
-          <Show when={me?.role === USER_ROLES.ADMIN} fallback={<ClientHomePage user={me} />}>
+          <Show when={me?.role === USER_ROLES.ADMIN} fallback={me ? <ClientHomePage user={me} /> : null}>
             <UsersPage />
           </Show>
         </Show>

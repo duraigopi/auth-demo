@@ -5,16 +5,17 @@ import { useState } from "react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useDebounceValue } from "usehooks-ts";
 import { Badge, Box, Button, Flex, Heading, Icon, IconButton, Show, Spinner, Stack, Table, Text } from "@chakra-ui/react";
-import { LuPencil, LuRefreshCw, LuRotateCcw, LuSearch, LuTrash2, LuUserCheck, LuUserX, LuUsers } from "react-icons/lu";
+import { LuPencil, LuRefreshCw, LuRotateCcw, LuSearch, LuTrash2, LuUserCheck, LuUserPlus, LuUserX, LuUsers } from "react-icons/lu";
 
 /* Lib module imports */
 import { Avatar } from "@/components/ui/avatar";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
+import { getMeApi } from "@lib/api/me";
 import { deleteUserApi, disableUserApi, enableUserApi, listUsersApi } from "@lib/api/users";
+import { CreateUserDialog } from "@lib/components/create-user-dialog";
 import { EditUserDialog } from "@lib/components/edit-user-dialog";
-import { USER_ROLES } from "@lib/constants/auth";
-import type { PublicUser, UserListResponse } from "@lib/types/auth";
+import type { PublicUser, UserListResponse, UserResponse } from "@lib/types/auth";
 
 /* Shared module imports */
 import { ConfirmationDialog } from "@shared/components/confirmation-dialog";
@@ -39,6 +40,13 @@ export const UsersPage = () => {
     keepPreviousData: true,
   });
 
+  /* The signed-in admin, so their own row can't be disabled, deleted or demoted */
+  const { data: me } = useApiQuery<UserResponse>({
+    queryKey: ["me"],
+    queryFn: getMeApi,
+  });
+
+  const [createOpen, setCreateOpen] = useState(false);
   const [editUser, setEditUser] = useState<PublicUser | null>(null);
   const [deleteUser, setDeleteUser] = useState<PublicUser | null>(null);
 
@@ -106,10 +114,16 @@ export const UsersPage = () => {
   return (
     <Box>
       <Stack maxW="5xl" mx="auto" gap="6" p={["4", "8"]}>
-        <Stack gap="1" color="#FFFFFF">
-          <Heading size="2xl">Users</Heading>
-          <Text opacity="0.9">Everyone who has an account.</Text>
-        </Stack>
+        <Flex justify="space-between" align="flex-end" gap="4" flexWrap="wrap">
+          <Stack gap="1" color="#FFFFFF">
+            <Heading size="2xl">Users</Heading>
+            <Text opacity="0.9">Everyone who has an account.</Text>
+          </Stack>
+          <Button variant="primary" onClick={() => setCreateOpen(true)}>
+            <LuUserPlus />
+            Add User
+          </Button>
+        </Flex>
 
         <Box bg="#F5F9FD" rounded="2xl" shadow="md" p="6">
           <Flex gap="4" mb="4" align="flex-end" flexWrap="wrap">
@@ -212,10 +226,10 @@ export const UsersPage = () => {
                           </Table.Cell>
                           <Table.Cell color="gray.600">{user.email}</Table.Cell>
                           <Table.Cell>
-                            <Badge colorPalette={user.role === USER_ROLES.ADMIN ? "blue" : "purple"}>{user.role}</Badge>
+                            <Badge variant={user.role}>{user.role}</Badge>
                           </Table.Cell>
                           <Table.Cell>
-                            <Badge colorPalette={user.is_active ? "green" : "red"}>
+                            <Badge variant={user.is_active ? "active" : "inactive"}>
                               {user.is_active ? "Active" : "Inactive"}
                             </Badge>
                           </Table.Cell>
@@ -235,9 +249,18 @@ export const UsersPage = () => {
                                   <LuPencil />
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip content={user.is_active ? "Disable user" : "Enable user"}>
+                              <Tooltip
+                                content={
+                                  user.user_id === me?.user_id
+                                    ? "You can't change your own status"
+                                    : user.is_active
+                                      ? "Disable user"
+                                      : "Enable user"
+                                }
+                              >
                                 <IconButton
                                   aria-label={user.is_active ? "Disable user" : "Enable user"}
+                                  disabled={user.user_id === me?.user_id}
                                   size="xs"
                                   variant="ghost"
                                   color={user.is_active ? "orange.600" : "green.600"}
@@ -246,9 +269,10 @@ export const UsersPage = () => {
                                   {user.is_active ? <LuUserX /> : <LuUserCheck />}
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip content="Delete user">
+                              <Tooltip content={user.user_id === me?.user_id ? "You can't delete your own account" : "Delete user"}>
                                 <IconButton
                                   aria-label="Delete user"
+                                  disabled={user.user_id === me?.user_id}
                                   size="xs"
                                   variant="ghost"
                                   color="red.600"
@@ -278,7 +302,8 @@ export const UsersPage = () => {
         </Box>
       </Stack>
 
-      <EditUserDialog user={editUser} onClose={() => setEditUser(null)} />
+      <CreateUserDialog open={createOpen} onClose={() => setCreateOpen(false)} />
+      <EditUserDialog user={editUser} currentUserId={me?.user_id} onClose={() => setEditUser(null)} />
       <ConfirmationDialog
         open={!!deleteUser}
         onOpenChange={(open) => !open && setDeleteUser(null)}

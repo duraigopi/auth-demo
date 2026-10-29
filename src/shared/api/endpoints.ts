@@ -1,4 +1,5 @@
 export const AUTH_ENDPOINTS = {
+  SETUP_ADMIN: "/api/v1/auth/setup-admin",
   SIGNUP: "/api/v1/auth/signup",
   LOGIN: "/api/v1/auth/login",
   REFRESH: "/api/v1/auth/refresh",

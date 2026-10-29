@@ -10,7 +10,6 @@ import { LuLock, LuLogOut, LuUser } from "react-icons/lu";
 /* Lib module imports */
 import { Avatar } from "@/components/ui/avatar";
 import { changePasswordApi, updateMeApi } from "@lib/api/me";
-import { USER_ROLES } from "@lib/constants/auth";
 import { changePasswordSchema, profileSchema } from "@lib/schema/profile";
 import type { ChangePasswordFormData, ProfileFormData, UserResponse } from "@lib/types/auth";
 
@@ -83,7 +82,7 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
                     {user?.email}
                   </Text>
                 </Stack>
-                <Badge ml="auto" colorPalette={user?.role === USER_ROLES.ADMIN ? "blue" : "purple"}>
+                <Badge ml="auto" variant={user?.role}>
                   {user?.role}
                 </Badge>
               </Flex>
