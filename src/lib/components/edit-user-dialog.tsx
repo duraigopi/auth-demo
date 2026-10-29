@@ -43,7 +43,7 @@ export const EditUserDialog = ({ user, currentUserId, onClose }: EditUserDialogP
 
   const { mutate: saveUser, isLoading } = useApiMutation<undefined, { userId: string; body: EditUserFormData }>({
     mutationFn: ({ userId, body }) => updateUserApi(userId, body),
-    invalidateQueryKeys: [["users"]],
+    invalidateQueryKeys: [["users"], ["me"]],
     successTitle: "User Updated Successfully",
     successDescription: "The changes have been saved.",
     errorTitle: "User Update Failed",

@@ -50,7 +50,7 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
 
   const { mutate: saveProfile, isLoading: isSavingProfile } = useApiMutation<undefined, ProfileFormData>({
     mutationFn: updateMeApi,
-    invalidateQueryKeys: [["me"]],
+    invalidateQueryKeys: [["me"], ["users"]],
     successTitle: "Profile Updated Successfully",
     successDescription: "Your name has been saved.",
     errorTitle: "Profile Update Failed",

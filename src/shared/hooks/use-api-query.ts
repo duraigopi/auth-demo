@@ -42,7 +42,7 @@ export const useApiQuery = <T,>({
   enabled = true,
   showErrorToast: shouldShowErrorToast = true,
   keepPreviousData = false,
-  retry = 1,
+  retry = false,
 }: UseApiQueryOptions<T>): UseApiQueryReturn<T> => {
   const query = useQuery<QueryCacheData<T>, ApiResponse<unknown>>({
     queryKey,
