@@ -94,10 +94,12 @@ const withAuthRetry = async <R>(perform: (token: string | null) => Promise<R>, u
   } catch (error) {
     if (!(error instanceof ApiError) || error.response?.statusCode !== 401) throw error;
 
+    /* Someone who was never signed in just gets sent to login, with no notice */
+    const hadSession = !!getRefreshToken();
     if (await refreshTokens()) return perform(getAccessToken());
 
     clearTokens();
-    markSessionEnded();
+    if (hadSession) markSessionEnded();
     /* No router here, so do a full page reload */
     /* eslint-disable-next-line @next/next/no-location-assign-relative-destination */
     window.location.href = "/auth/login";
