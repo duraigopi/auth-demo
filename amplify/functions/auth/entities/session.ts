@@ -45,9 +45,9 @@ export const SessionEntity = new Entity(
       },
     },
     indexes: {
-      /* Partition key only: one row per login session */
+      /* Partition key only: one row per login session, casing none keeps the id exactly as generated */
       primary: {
-        pk: { field: "session_id", composite: ["session_id"] },
+        pk: { field: "session_id", composite: ["session_id"], casing: "none" },
       },
       /* Secondary index on user_id, used to find every session of a user (password change) */
       byUser: {

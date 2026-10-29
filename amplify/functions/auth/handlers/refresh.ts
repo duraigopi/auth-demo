@@ -25,6 +25,12 @@ export const refresh = async (c: Context) => {
     return c.json(response, 401);
   };
 
+  const revokeSession = (sessionId: string) =>
+    SessionEntity
+      .patch({ session_id: sessionId })
+      .set({ is_revoked: true })
+      .go();
+
   try {
     if (!token) return sessionEnded();
 
@@ -47,7 +53,7 @@ export const refresh = async (c: Context) => {
         }),
     ]);
 
-    /* The session must be active, belong to this user and match the latest refresh token */
+    /* The session must be active and belong to this user */
     if (
       !session
       || !user
@@ -55,8 +61,13 @@ export const refresh = async (c: Context) => {
       || session.is_revoked
       || session.ttl <= getUnixTimestamp()
       || session.user_id !== payload.sub
-      || session.refresh_token !== payload.jti
     ) {
+      return sessionEnded();
+    }
+
+    /* An old refresh token was used again, it may have been copied, so end the session */
+    if (session.refresh_token !== payload.jti) {
+      await revokeSession(session.session_id);
       return sessionEnded();
     }
 
@@ -78,11 +89,8 @@ export const refresh = async (c: Context) => {
         });
       if (latest?.refresh_token === session.refresh_token) throw error;
 
-      /* The token was already used, which could mean it was copied, so end the session */
-      await SessionEntity
-        .patch({ session_id: session.session_id })
-        .set({ is_revoked: true })
-        .go();
+      /* The token was already used by a request at the same time, so end the session */
+      await revokeSession(session.session_id);
       return sessionEnded();
     }
 
