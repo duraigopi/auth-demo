@@ -1,8 +1,10 @@
 "use client";
 
 /* Library imports */
+import { useEffect } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import type { FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,11 +22,13 @@ import { TextField } from "@shared/components/text-field";
 import { useApiMutation } from "@shared/hooks/use-api-query";
 import { useRedirectIfLoggedIn } from "@shared/hooks/use-redirect-if-logged-in";
 import { getErrorMessages } from "@shared/utils/form";
-import { saveTokens } from "@shared/utils/token-storage";
+import { showErrorToast } from "@shared/utils/notifications";
+import { saveTokens, takeSessionEnded } from "@shared/utils/token-storage";
 
 export const LoginForm = () => {
   useRedirectIfLoggedIn();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { control, handleSubmit } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -33,6 +37,15 @@ export const LoginForm = () => {
     },
   });
 
+  useEffect(() => {
+    if (takeSessionEnded()) {
+      showErrorToast({
+        title: "Session Ended",
+        description: "Your session has ended. Please log in again.",
+      });
+    }
+  }, []);
+
   const { mutate: login, isLoading } = useApiMutation<LoginResponse, LoginFormData>({
     mutationFn: loginApi,
     successTitle: "Logged In Successfully",
@@ -40,6 +53,7 @@ export const LoginForm = () => {
     errorTitle: "Login Failed",
     onSuccess: ({ accessToken, refreshToken }) => {
       saveTokens({ accessToken, refreshToken });
+      queryClient.clear();
       router.push("/");
     },
   });

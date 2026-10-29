@@ -15,6 +15,7 @@ import type { UserResponse } from "@lib/types/auth";
 
 /* Shared module imports */
 import { useApiQuery } from "@shared/hooks/use-api-query";
+import { showSuccessToast } from "@shared/utils/notifications";
 import { clearTokens } from "@shared/utils/token-storage";
 
 /* Top bar with the app name and the profile avatar */
@@ -30,6 +31,11 @@ export const Header = () => {
     /* Clear the tokens even if the logout call fails */
     await logoutApi();
     clearTokens();
+    setProfileOpen(false);
+    showSuccessToast({
+      title: "Signed Out",
+      description: "You have been successfully logged out.",
+    });
     router.push("/auth/login");
   };
 
@@ -68,7 +74,7 @@ export const Header = () => {
         </Box>
       </Flex>
 
-      <ProfileDialog user={me} open={profileOpen} onOpenChange={setProfileOpen} onLogout={onLogout} />
+      <ProfileDialog key={me?.user_id} user={me} open={profileOpen} onOpenChange={setProfileOpen} onLogout={onLogout} />
     </Box>
   );
 };

@@ -16,7 +16,9 @@ export interface PaginationBarProps {
   onPageSizeChange: (pageSize: number) => void;
 }
 
-const PAGE_SIZES = [5, 10, 25, 50].map((size) => ({ label: String(size), value: size }));
+export const PAGE_SIZE_VALUES = [5, 10, 25, 50];
+
+const PAGE_SIZES = PAGE_SIZE_VALUES.map((size) => ({ label: String(size), value: size }));
 
 export const PaginationBar = ({ page, pageSize, count, onPageChange, onPageSizeChange }: PaginationBarProps) => (
   <Show when={count > 0}>

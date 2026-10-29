@@ -8,7 +8,7 @@ import { AUTH_ENDPOINTS } from "@lib/constants/endpoints";
 /* Shared module imports */
 import outputs from "@amplifyOutputs";
 import type { ApiResponse, AuthTokens } from "@shared/types/api";
-import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from "@shared/utils/token-storage";
+import { clearTokens, getAccessToken, getRefreshToken, markSessionEnded, saveTokens } from "@shared/utils/token-storage";
 
 /* Point Amplify at the API from the outputs file */
 const configureAmplify = () => {
@@ -97,6 +97,7 @@ const withAuthRetry = async <R>(perform: (token: string | null) => Promise<R>, u
     if (await refreshTokens()) return perform(getAccessToken());
 
     clearTokens();
+    markSessionEnded();
     /* No router here, so do a full page reload */
     /* eslint-disable-next-line @next/next/no-location-assign-relative-destination */
     window.location.href = "/auth/login";

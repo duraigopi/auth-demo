@@ -22,7 +22,8 @@ export const nameField = z
   .string()
   .trim()
   .min(1, "Please enter your full name")
-  .max(100, "Please enter a name less than 100 characters");
+  .max(100, "Please enter a name less than 100 characters")
+  .regex(/^[^<>]*$/, "Please enter a valid full name");
 
 export const passwordField = z
   .string()

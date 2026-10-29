@@ -6,6 +6,7 @@ export const authFunction = defineFunction({
   name: "auth-function",
   entry: "handler.ts",
   timeoutSeconds: 30,
+  memoryMB: 1024,
   runtime: 24,
   environment: {
     JWT_SECRET: process.env.JWT_SECRET ?? "",

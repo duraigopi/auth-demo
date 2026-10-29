@@ -1,7 +1,7 @@
 "use client";
 
 /* Library imports */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useDebounceValue } from "usehooks-ts";
 import { Badge, Box, Button, Flex, Heading, Icon, IconButton, Show, Spinner, Stack, Table, Text } from "@chakra-ui/react";
@@ -22,7 +22,7 @@ import type { PublicUser, UserListResponse, UserResponse } from "@lib/types/auth
 /* Shared module imports */
 import { ConfirmationDialog } from "@shared/components/confirmation-dialog";
 import { DateField } from "@shared/components/date-field";
-import { PaginationBar } from "@shared/components/pagination-bar";
+import { PAGE_SIZE_VALUES, PaginationBar } from "@shared/components/pagination-bar";
 import { ScrollableContainer } from "@shared/components/scrollable-container";
 import { TextField } from "@shared/components/text-field";
 import { useApiMutation, useApiQuery } from "@shared/hooks/use-api-query";
@@ -36,11 +36,20 @@ export const UsersPage = () => {
   const [to, setTo] = useQueryState("to", parseAsString.withDefault(""));
   const [debouncedSearch] = useDebounceValue(search, 300);
 
+  /* A hand-edited URL can hold a bad page or size, so fall back to safe values */
+  const currentPage = Math.max(page, 1);
+  const currentLimit = PAGE_SIZE_VALUES.includes(limit) ? limit : 10;
+
   const { data: users, pagination, isLoading, isFetching, refetch } = useApiQuery<UserListResponse>({
-    queryKey: ["users", page, limit, debouncedSearch, from, to],
-    queryFn: () => listUsersApi({ page, limit, search: debouncedSearch, from, to }),
+    queryKey: ["users", currentPage, currentLimit, debouncedSearch, from, to],
+    queryFn: () => listUsersApi({ page: currentPage, limit: currentLimit, search: debouncedSearch, from, to }),
     keepPreviousData: true,
   });
+
+  /* Past the last page (a stale link, or the last row was deleted), go back to the first */
+  useEffect(() => {
+    if (!isFetching && currentPage > 1 && !users?.length) setPage(1);
+  }, [isFetching, currentPage, users, setPage]);
 
   /* The signed-in admin, so their own row can't be disabled, deleted or demoted */
   const { data: me } = useApiQuery<UserResponse>({
@@ -283,8 +292,8 @@ export const UsersPage = () => {
               </Stack>
 
               <PaginationBar
-                page={page}
-                pageSize={limit}
+                page={currentPage}
+                pageSize={currentLimit}
                 count={pagination?.total ?? 0}
                 onPageChange={setPage}
                 onPageSizeChange={onPageSizeChange}
