@@ -2,7 +2,7 @@
 
 /* Library imports */
 import { useEffect, useState } from "react";
-import { parseAsInteger, parseAsNumberLiteral, parseAsString, useQueryState } from "nuqs";
+import { parseAsInteger, parseAsNumberLiteral, parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useBoolean, useDebounceValue } from "usehooks-ts";
 import { Badge, Box, Button, Flex, Heading, Icon, IconButton, Show, Spinner, Stack, Table, Text } from "@chakra-ui/react";
 import { LuRefreshCw, LuRotateCcw, LuSearch, LuUserPlus, LuUsers } from "react-icons/lu";
@@ -17,6 +17,14 @@ import { deleteUserApi, disableUserApi, enableUserApi, listUsersApi } from "@lib
 import { CreateUserDialog } from "@lib/components/create-user-dialog";
 import { EditUserDialog } from "@lib/components/edit-user-dialog";
 import { UserActions } from "@lib/components/user-actions";
+import {
+  FILTER_ALL,
+  ROLE_FILTER_CHOICES,
+  STATUS_FILTER_CHOICES,
+  USER_ROLE_VALUES,
+  USER_STATUSES,
+  USER_STATUS_VALUES,
+} from "@lib/constants/auth";
 import type { PublicUser, UserListResponse, UserResponse } from "@lib/types/auth";
 
 /* Shared module imports */
@@ -25,6 +33,7 @@ import { DateField } from "@shared/components/date-field";
 import { PAGE_SIZE_VALUES, PaginationBar } from "@shared/components/pagination-bar";
 import type { PageSize } from "@shared/components/pagination-bar";
 import { ScrollableContainer } from "@shared/components/scrollable-container";
+import { SelectField } from "@shared/components/select-field";
 import { TextField } from "@shared/components/text-field";
 import { useApiMutation, useApiQuery } from "@shared/hooks/use-api-query";
 import { formatDisplayDate } from "@shared/utils/time";
@@ -33,6 +42,8 @@ export const UsersPage = () => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [limit, setLimit] = useQueryState("limit", parseAsNumberLiteral(PAGE_SIZE_VALUES).withDefault(10));
   const [search, setSearch] = useQueryState("search", parseAsString.withDefault(""));
+  const [role, setRole] = useQueryState("role", parseAsStringLiteral(USER_ROLE_VALUES));
+  const [status, setStatus] = useQueryState("status", parseAsStringLiteral(USER_STATUS_VALUES));
   const [from, setFrom] = useQueryState("from", parseAsString.withDefault(""));
   const [to, setTo] = useQueryState("to", parseAsString.withDefault(""));
   const [debouncedSearch] = useDebounceValue(search, 300);
@@ -41,8 +52,17 @@ export const UsersPage = () => {
   const currentPage = Math.max(page, 1);
 
   const { data: users, pagination, isLoading, isFetching, refetch } = useApiQuery<UserListResponse>({
-    queryKey: ["users", currentPage, limit, debouncedSearch, from, to],
-    queryFn: () => listUsersApi({ page: currentPage, limit, search: debouncedSearch, from, to }),
+    queryKey: ["users", currentPage, limit, debouncedSearch, role, status, from, to],
+    queryFn: () =>
+      listUsersApi({
+        page: currentPage,
+        limit,
+        search: debouncedSearch,
+        role: role ?? "",
+        is_active: status ? String(status === USER_STATUSES.ACTIVE) : "",
+        from,
+        to,
+      }),
     keepPreviousData: true,
   });
 
@@ -98,7 +118,18 @@ export const UsersPage = () => {
   };
 
   /* True when any filter is set */
-  const hasActiveFilters = !!search || !!from || !!to;
+  const hasActiveFilters = !!search || !!role || !!status || !!from || !!to;
+
+  /* The "all" choice is in neither list, so it finds nothing and clears the filter */
+  const onRoleChange = (value: string) => {
+    setRole(USER_ROLE_VALUES.find((item) => item === value) ?? null);
+    setPage(1);
+  };
+
+  const onStatusChange = (value: string) => {
+    setStatus(USER_STATUS_VALUES.find((item) => item === value) ?? null);
+    setPage(1);
+  };
 
   const onFromChange = (value: string) => {
     setFrom(value);
@@ -112,6 +143,8 @@ export const UsersPage = () => {
 
   const onClearFilters = () => {
     setSearch("");
+    setRole(null);
+    setStatus(null);
     setFrom("");
     setTo("");
     setPage(1);
@@ -137,37 +170,58 @@ export const UsersPage = () => {
         </Flex>
 
         <Box bg="#F5F9FD" rounded="2xl" shadow="md" p="6">
-          <Flex gap="4" mb="4" align="flex-end" flexWrap="wrap">
-            <Box w={["full", "xs"]}>
-              <TextField
-                label="Search"
-                value={search}
-                placeholder="Search by name or email"
-                leftIcon={<LuSearch />}
-                onChange={(event) => onSearch(event.target.value)}
-              />
-            </Box>
-            <Box w={["full", "44"]}>
-              <DateField label="Created From" value={from} maxDate={to} onChange={onFromChange} />
-            </Box>
-            <Box w={["full", "44"]}>
-              <DateField label="Created To" value={to} minDate={from} onChange={onToChange} />
-            </Box>
-            <Flex gap="2" ml="auto">
-              <Tooltip content="Reset filters">
-                <IconButton aria-label="Reset filters" variant="pagination" onClick={onClearFilters}>
-                  <LuRotateCcw />
-                </IconButton>
-              </Tooltip>
-              <Tooltip content="Refresh">
-                <IconButton aria-label="Refresh" variant="pagination" onClick={() => refetch()}>
-                  <Icon animation={isFetching ? "spin 0.9s linear infinite" : undefined}>
-                    <LuRefreshCw />
-                  </Icon>
-                </IconButton>
-              </Tooltip>
+          <Stack gap="4" mb="4">
+            <Flex gap="4" flexWrap="wrap">
+              <Box w={{ base: "full", md: "auto" }} flex={{ md: "1" }} minW="0">
+                <TextField
+                  label="Search"
+                  value={search}
+                  placeholder="Search by name or email"
+                  leftIcon={<LuSearch />}
+                  onChange={(event) => onSearch(event.target.value)}
+                />
+              </Box>
+              <Box flex={{ base: "1", md: "none" }} minW="0" w={{ md: "44" }}>
+                <SelectField 
+                  label="Role" 
+                  value={role ?? FILTER_ALL} 
+                  options={ROLE_FILTER_CHOICES} 
+                  onChange={onRoleChange} 
+                />
+              </Box>
+              <Box flex={{ base: "1", md: "none" }} minW="0" w={{ md: "44" }}>
+                <SelectField
+                  label="Status"
+                  value={status ?? FILTER_ALL}
+                  options={STATUS_FILTER_CHOICES}
+                  onChange={onStatusChange}
+                />
+              </Box>
             </Flex>
-          </Flex>
+
+            <Flex gap="4" align="flex-end" flexWrap="wrap">
+              <Box w={["full", "44"]}>
+                <DateField label="Created From" value={from} maxDate={to} onChange={onFromChange} />
+              </Box>
+              <Box w={["full", "44"]}>
+                <DateField label="Created To" value={to} minDate={from} onChange={onToChange} />
+              </Box>
+              <Flex gap="2" ml="auto">
+                <Tooltip content="Reset filters">
+                  <IconButton aria-label="Reset filters" variant="pagination" onClick={onClearFilters}>
+                    <LuRotateCcw />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip content="Refresh">
+                  <IconButton aria-label="Refresh" variant="pagination" onClick={() => refetch()}>
+                    <Icon animation={isFetching ? "spin 0.9s linear infinite" : undefined}>
+                      <LuRefreshCw />
+                    </Icon>
+                  </IconButton>
+                </Tooltip>
+              </Flex>
+            </Flex>
+          </Stack>
 
           <Show
             when={!isLoading}
@@ -193,12 +247,8 @@ export const UsersPage = () => {
                   <EmptyState
                     icon={<LuUsers />}
                     title="No users match your filters"
-                    description="Try a different search or date range."
-                  >
-                    <Button variant="outline" size="sm" onClick={onClearFilters}>
-                      Reset Filters
-                    </Button>
-                  </EmptyState>
+                    description="Try a different search, role, status or date range."
+                  />
                 </Show>
               }
             >

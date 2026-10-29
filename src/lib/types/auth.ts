@@ -2,7 +2,7 @@
 import type { z } from "zod/v4";
 
 /* Lib module imports */
-import type { USER_ROLES } from "@lib/constants/auth";
+import type { USER_ROLES, USER_STATUSES } from "@lib/constants/auth";
 import type { loginSchema, signupSchema } from "@lib/schema/auth";
 import type { changePasswordSchema, profileSchema } from "@lib/schema/profile";
 import type { createUserSchema, editUserSchema } from "@lib/schema/users";
@@ -12,6 +12,9 @@ import type { AuthTokens } from "@shared/types/api";
 
 /* User role, one of USER_ROLES */
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
+
+/* Status filter value used in the users page URL and the filter select, one of USER_STATUSES */
+export type UserStatus = (typeof USER_STATUSES)[keyof typeof USER_STATUSES];
 
 /* Login form values */
 export type LoginFormData = z.infer<typeof loginSchema>;
@@ -79,6 +82,8 @@ export interface UserListParams {
   page: number;
   limit: number;
   search?: string;
+  role?: string;
+  is_active?: string;
   from?: string;
   to?: string;
 }
