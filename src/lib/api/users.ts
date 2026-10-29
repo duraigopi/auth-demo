@@ -1,4 +1,5 @@
 /* Lib module imports */
+import { USER_ENDPOINTS } from "@lib/constants/endpoints";
 import type {
   CreateUserBody,
   UpdateUserBody,
@@ -8,7 +9,6 @@ import type {
 } from "@lib/types/auth";
 
 /* Shared module imports */
-import { USER_ENDPOINTS } from "@shared/api/endpoints";
 import { amplifyDelete, amplifyGet, amplifyPost, amplifyPut } from "@shared/utils/amplify-api";
 
 export const listUsersApi = (params: UserListParams) =>

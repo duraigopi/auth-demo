@@ -1,8 +1,8 @@
 /* Lib module imports */
+import { ME_ENDPOINTS } from "@lib/constants/endpoints";
 import type { ChangePasswordBody, UpdateProfileBody, UserResponse } from "@lib/types/auth";
 
 /* Shared module imports */
-import { ME_ENDPOINTS } from "@shared/api/endpoints";
 import { amplifyGet, amplifyPut } from "@shared/utils/amplify-api";
 
 export const getMeApi = () =>

@@ -1,8 +1,8 @@
 /* Lib module imports */
+import { AUTH_ENDPOINTS } from "@lib/constants/endpoints";
 import type { LoginFormData, LoginResponse, SignupRequestBody, UserResponse } from "@lib/types/auth";
 
 /* Shared module imports */
-import { AUTH_ENDPOINTS } from "@shared/api/endpoints";
 import { amplifyPost } from "@shared/utils/amplify-api";
 
 export const loginApi = (body: LoginFormData) =>

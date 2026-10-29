@@ -24,7 +24,6 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
   );
 
   return (
-    /* Adapter stays outside Chakra so its hidden Suspense is first, ahead of Chakra's inline styles */
     <NuqsAdapter>
       <Provider>
         <QueryClientProvider client={queryClient}>

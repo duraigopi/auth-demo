@@ -2,9 +2,11 @@
 import { Amplify } from "aws-amplify";
 import { ApiError, del, get, post, put } from "aws-amplify/api";
 
+/* Lib module imports */
+import { AUTH_ENDPOINTS } from "@lib/constants/endpoints";
+
 /* Shared module imports */
 import outputs from "@amplifyOutputs";
-import { AUTH_ENDPOINTS } from "@shared/api/endpoints";
 import type { ApiResponse, AuthTokens } from "@shared/types/api";
 import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from "@shared/utils/token-storage";
 
