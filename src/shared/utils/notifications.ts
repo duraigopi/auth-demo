@@ -4,7 +4,7 @@ import { toaster } from "@/components/ui/toaster";
 /* Shared module imports */
 import type { ApiResponse } from "@shared/types/api";
 
-/* Toast content, with the type decided by the helper that is called */
+/* Toast content */
 interface ToastConfig {
   title: string;
   description?: string;
@@ -24,7 +24,7 @@ const createToast = (type: ToastType, config: ToastConfig) => {
 
 export const showSuccessToast = (config: ToastConfig) => createToast("success", config);
 
-/* Errors stay until dismissed so they can be read, unless the caller sets a duration */
+/* Errors stay until dismissed unless a duration is set */
 export const showErrorToast = (config: ToastConfig) =>
   createToast("error", { duration: Infinity, ...config });
 
@@ -32,7 +32,7 @@ export const showWarningToast = (config: ToastConfig) => createToast("warning", 
 
 export const showInfoToast = (config: ToastConfig) => createToast("info", config);
 
-/* Shows a failed API response: the first validation error if there is one, otherwise the server's message */
+/* Show the first validation error, or the server message */
 export const showApiErrorToast = (response: ApiResponse<unknown>, defaultTitle = "Operation Failed") => {
   const [firstError] = response.validation_errors ?? [];
   if (firstError) {

@@ -7,13 +7,13 @@ import type { SelectRootProps } from "@chakra-ui/react";
 /* Lib module imports */
 import { Field } from "@/components/ui/field";
 
-/* One choice in the dropdown */
+/* One option in the select */
 export interface SelectOption {
   label: string;
   value: string | number;
 }
 
-/* Props of the select field, same label and error handling as the text field */
+/* Props for the select field */
 export interface SelectFieldProps {
   options: SelectOption[];
   value: string;

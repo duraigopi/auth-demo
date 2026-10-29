@@ -24,7 +24,7 @@ authRoutes.post("/signup", zValidatorWrapper("json", signupSchema), signup);
 /* POST /login: check credentials and start a session (public) */
 authRoutes.post("/login", zValidatorWrapper("json", loginSchema), login);
 
-/* POST /refresh: exchange the refresh token (sent in the Authorization header) for new tokens, public because the access token has usually expired */
+/* POST /refresh: get new tokens from the refresh token (public, the access token has expired) */
 authRoutes.post("/refresh", refresh);
 
 /* POST /logout: revoke the current session */

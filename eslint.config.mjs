@@ -5,7 +5,7 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  /* Build output and generated types are not ours to lint; the backend has its own toolchain */
+  /* Skip build output, generated types and the backend */
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "amplify/**"]),
 
   {
@@ -20,22 +20,22 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-empty-object-type": "error",
       "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
       "@typescript-eslint/no-unused-expressions": "error",
-      /* `_`-prefixed names mark a deliberately unused binding; rest siblings are exempt */
+      /* Names starting with _ are allowed to be unused */
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_", ignoreRestSiblings: true },
       ],
 
-      /* Arrow functions for components, handlers, utilities and page exports */
+      /* Arrow functions only */
       "func-style": ["error", "expression", { allowArrowFunctions: true }],
 
-      /* Warn and error stay allowed so real problems still reach the console */
+      /* console.warn and console.error are still allowed */
       "no-console": ["error", { allow: ["warn", "error"] }],
 
-      /* Type-only imports carry the `type` keyword so the bundler can drop them */
+      /* Use `import type` for types */
       "@typescript-eslint/consistent-type-imports": "error",
 
-      /* Config comes from amplify_outputs.json, not process.env; NODE_ENV is set by the toolchain */
+      /* Config comes from amplify_outputs.json, not process.env */
       "no-restricted-syntax": [
         "error",
         {
@@ -45,12 +45,12 @@ const eslintConfig = defineConfig([
         },
       ],
 
-      /* Quotes and apostrophes are written as themselves; JSX escapes them safely */
+      /* Allow quotes and apostrophes in JSX text */
       "react/no-unescaped-entities": "off",
     },
   },
 
-  /* Vendored Chakra snippets stay close to upstream so they can be re-synced */
+  /* Chakra snippets are kept close to upstream */
   {
     files: ["src/components/ui/**"],
     rules: {

@@ -15,7 +15,7 @@ import type { UserResponse } from "@lib/types/auth";
 import { ScrollableContainer } from "@shared/components/scrollable-container";
 import { useApiQuery } from "@shared/hooks/use-api-query";
 
-/* Root page: admins get the users list, everyone else gets their own account page */
+/* Admins see the users list, clients see their own page */
 export const HomePage = () => {
   const { data: me, isLoading } = useApiQuery<UserResponse>({
     queryKey: ["me"],
@@ -23,14 +23,14 @@ export const HomePage = () => {
   });
 
   return (
-    /* The page is exactly one screen tall; only the area under the header scrolls, with our scrollbar */
+    /* Fixed height so only the content area scrolls */
     <Flex direction="column" h="100vh">
       <Header />
       <ScrollableContainer flex="1" minH="0">
         <Show
           when={!isLoading}
           fallback={
-            /* The header is 4rem tall, so this fills the rest of the screen and centers the spinner in it */
+            /* Center the spinner below the 4rem header */
             <Flex justify="center" align="center" minH="calc(100vh - 4rem)">
               <Spinner color="#FFFFFF" size="lg" />
             </Flex>

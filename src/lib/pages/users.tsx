@@ -74,11 +74,11 @@ export const UsersPage = () => {
 
   const onSearch = (value: string) => {
     setSearch(value);
-    /* A new search starts from the first page */
+    /* Go back to page 1 on a new search */
     setPage(1);
   };
 
-  /* Decides which empty message to show: nothing matches the filters, or there are no users at all */
+  /* True when any filter is set */
   const hasActiveFilters = !!search || !!from || !!to;
 
   const onFromChange = (value: string) => {

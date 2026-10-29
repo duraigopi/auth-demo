@@ -40,7 +40,7 @@ export const SignupForm = () => {
     onSuccess: () => router.push("/auth/login"),
   });
 
-  /* The confirm-password field is only for the form, so it isn't sent */
+  /* confirmPassword is not sent to the API */
   const onSubmit = ({ name, email, password }: SignupFormData) => signup({ name, email, password });
 
   const onError = (errors: FieldErrors<SignupFormData>) => {

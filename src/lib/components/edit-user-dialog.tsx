@@ -19,7 +19,7 @@ import { SelectField } from "@shared/components/select-field";
 import { TextField } from "@shared/components/text-field";
 import { useApiMutation } from "@shared/hooks/use-api-query";
 
-/* Props of the edit dialog; it is open while a user is set */
+/* Props for the edit user dialog */
 export interface EditUserDialogProps {
   user: PublicUser | null;
   onClose: () => void;
@@ -39,7 +39,7 @@ export const EditUserDialog = ({ user, onClose }: EditUserDialogProps) => {
     },
   });
 
-  /* Fill the form with the chosen user each time the dialog opens */
+  /* Reset the form with the selected user's values */
   useEffect(() => {
     if (user) reset({ name: user.name, role: user.role });
   }, [user, reset]);

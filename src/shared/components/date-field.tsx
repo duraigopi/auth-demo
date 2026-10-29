@@ -8,7 +8,7 @@ import { parseDate } from "@internationalized/date";
 /* Lib module imports */
 import { Field } from "@/components/ui/field";
 
-/* Props of the date field; dates are YYYY-MM-DD strings, shown as dd/mm/yyyy */
+/* Props for the date field, values are YYYY-MM-DD */
 export interface DateFieldProps {
   value: string;
   onChange: (value: string) => void;
@@ -19,12 +19,12 @@ export interface DateFieldProps {
   helperText?: string;
   required?: boolean;
   disabled?: boolean;
-  /* Days outside the range are greyed out in the calendar */
+  /* Days outside this range can't be picked */
   minDate?: string;
   maxDate?: string;
 }
 
-/* Turns a YYYY-MM-DD string into a date, or undefined when it is empty or invalid */
+/* Parse a YYYY-MM-DD string, undefined if invalid */
 const safeParse = (dateString?: string) => {
   if (!dateString) return undefined;
   try {
@@ -69,10 +69,10 @@ export const DateField = ({
         disabled={disabled}
         closeOnSelect
         size="md"
-        /* Fixed, so a parent with overflow hidden cannot cut the calendar off */
+        /* Fixed so a parent with overflow hidden won't clip it */
         positioning={{ placement: "bottom-start", strategy: "fixed", gutter: 4 }}
         format={(date) => `${String(date.day).padStart(2, "0")}/${String(date.month).padStart(2, "0")}/${date.year}`}
-        /* Bad or half-typed input is ignored, so the old value stays */
+        /* Ignore half typed input and keep the old value */
         parse={(input) => {
           const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(input.trim());
           return match ? safeParse(`${match[3]}-${match[2]}-${match[1]}`) : undefined;

@@ -69,7 +69,7 @@ export const refresh = async (c: Context) => {
         .where(({ refresh_token }, { eq }) => eq(refresh_token, session.refresh_token))
         .go();
     } catch (error) {
-      /* If the stored token id is unchanged, the update failed for another reason, which is not a reuse */
+      /* Same token id means the update failed for another reason, not a reuse */
       const { data: latest } = await SessionEntity
         .get({ session_id: session.session_id })
         .go({

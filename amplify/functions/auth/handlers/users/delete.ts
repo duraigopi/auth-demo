@@ -6,7 +6,7 @@ import { logError } from "@backend/utils/logger";
 import type { AuthValidatedContext } from "@backend/types/api";
 import type { UserIdParam } from "@backend/types/auth";
 
-/* Permanently deletes the user (use disable to keep the record), leftover sessions expire through their ttl */
+/* Permanently delete the user, old sessions expire through their ttl */
 export const remove = async (c: AuthValidatedContext<{ param: UserIdParam }>) => {
   const { userId } = c.req.valid("param");
 

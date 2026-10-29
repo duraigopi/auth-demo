@@ -1,7 +1,7 @@
 /* Library imports */
 import { createSystem, defaultConfig, defineConfig, defineRecipe, defineSlotRecipe } from "@chakra-ui/react";
 
-/* Adds the `primary` and `pagination` variants to Chakra's default button recipe */
+/* Adds the primary and pagination button variants */
 const buttonRecipe = defineRecipe({
   variants: {
     variant: {
@@ -14,7 +14,7 @@ const buttonRecipe = defineRecipe({
         rounded: "xl",
         _hover: { opacity: 0.9 },
       },
-      /* Page buttons: the current page gets the gradient. bgColor, not bg, so a hover never wipes out the gradient image. */
+      /* Page buttons, the selected page gets the gradient */
       pagination: {
         bgColor: "#FFFFFF",
         color: "#0067D8",
@@ -27,7 +27,7 @@ const buttonRecipe = defineRecipe({
           gradientTo: "#00B398",
           color: "#FFFFFF",
           borderColor: "transparent",
-          /* The gradient covers the background color, so the hover is a fade instead */
+          /* Fade on hover, a background color would not show over the gradient */
           _hover: { opacity: 0.85 },
         },
       },
@@ -35,7 +35,7 @@ const buttonRecipe = defineRecipe({
   },
 });
 
-/* Chakra blocks selecting label text, and browsers show an arrow cursor over labels */
+/* Allow selecting label text and show a text cursor */
 const fieldRecipe = defineSlotRecipe({
   slots: ["root", "label", "input", "textarea", "errorText", "helperText", "select", "requiredIndicator"],
   base: {
@@ -46,7 +46,7 @@ const fieldRecipe = defineSlotRecipe({
   },
 });
 
-/* The default input border is almost invisible on our light cards, so inputs get a clear blue-grey one */
+/* Stronger input border, the default is too faint on light cards */
 const inputRecipe = defineRecipe({
   variants: {
     variant: {
@@ -59,7 +59,7 @@ const inputRecipe = defineRecipe({
   },
 });
 
-/* Same border for the select trigger */
+/* Same border for the select */
 const selectRecipe = defineSlotRecipe({
   slots: ["trigger"],
   variants: {
@@ -75,7 +75,7 @@ const selectRecipe = defineSlotRecipe({
   },
 });
 
-/* Dialogs share one look: dimmed blurred backdrop, rounded card, gradient header, light footer divider */
+/* Shared dialog look */
 const dialogRecipe = defineSlotRecipe({
   slots: ["backdrop", "positioner", "content", "header", "body", "footer", "title", "description", "closeTrigger"],
   base: {
@@ -118,7 +118,7 @@ const dialogRecipe = defineSlotRecipe({
 
 const config = defineConfig({
   globalCss: {
-    /* One background for every page, fixed so it fills the screen however long the page is */
+    /* Same gradient background on every page */
     body: {
       bg: "linear-gradient(to bottom, #0067D8, #00B398)",
       backgroundAttachment: "fixed",

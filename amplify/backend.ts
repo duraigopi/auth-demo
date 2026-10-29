@@ -16,13 +16,13 @@ const backend = defineBackend({
   authFunction,
 });
 
-/* Own stack, so a function change never replaces the API and its URL */
+/* Separate stack so a function change doesn't replace the API URL */
 const apiStack = backend.createStack("api-stack");
 
-/* Same origins the Lambda allows; .env was already loaded by the function resource above */
+/* Same origins the Lambda allows */
 const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "http://localhost:3000").split(",").map((origin) => origin.trim());
 
-/* HTTP API (v2) is cheaper than a REST API and matches the event format the Lambda reads. Browser preflight requests are answered here, so they never start the Lambda. */
+/* HTTP API is cheaper than REST and answers CORS preflight itself */
 const httpApi = new HttpApi(apiStack, "auth-api", {
   apiName: "auth-api",
   corsPreflight: {
@@ -32,12 +32,12 @@ const httpApi = new HttpApi(apiStack, "auth-api", {
   },
 });
 
-/* One API Gateway route per path and method, all forwarding to the same Lambda */
+/* One route per path and method, all go to the same Lambda */
 API_ROUTES.forEach(({ basePath, routes }) => {
   const integration = new HttpLambdaIntegration(`${basePath}-integration`, backend.authFunction.resources.lambda);
 
   routes.forEach(({ path, methods }) => {
-    /* Edge slashes are trimmed first, because API Gateway treats a trailing "/" as a different route */
+    /* Trim edge slashes, a trailing "/" is a different route */
     const fullPath = posix.join("/api/v1", basePath.replace(/^\/+|\/+$/g, ""), path.replace(/^\/+|\/+$/g, ""));
     httpApi.addRoutes({
       path: fullPath,
@@ -47,14 +47,14 @@ API_ROUTES.forEach(({ basePath, routes }) => {
   });
 });
 
-/* Tables live in their own stack. Names, keys and index names must match the entities in functions/auth/entities. */
+/* Tables in their own stack, names and keys must match the entities */
 const dataStack = backend.createStack("data-stack");
 
 const usersTable = new Table(dataStack, "UsersTable", {
   tableName: "Users",
   partitionKey: { name: "user_id", type: AttributeType.STRING },
   billingMode: BillingMode.PAY_PER_REQUEST,
-  /* Demo setting: deleting the stack deletes the data. Use RETAIN once real accounts exist. */
+  /* Demo only, deleting the stack deletes the data. Use RETAIN for real data. */
   removalPolicy: RemovalPolicy.DESTROY,
 });
 usersTable.addGlobalSecondaryIndex({
@@ -66,7 +66,7 @@ const sessionsTable = new Table(dataStack, "SessionsTable", {
   tableName: "Sessions",
   partitionKey: { name: "session_id", type: AttributeType.STRING },
   billingMode: BillingMode.PAY_PER_REQUEST,
-  /* DynamoDB deletes a row once its ttl time (Unix seconds) has passed */
+  /* DynamoDB removes the row after the ttl time (Unix seconds) */
   timeToLiveAttribute: "ttl",
   removalPolicy: RemovalPolicy.DESTROY,
 });
@@ -83,12 +83,12 @@ const loginAttemptsTable = new Table(dataStack, "LoginAttemptsTable", {
   removalPolicy: RemovalPolicy.DESTROY,
 });
 
-/* Read and write access for the Lambda, including the indexes */
+/* Lambda gets read and write access, indexes included */
 usersTable.grantReadWriteData(backend.authFunction.resources.lambda);
 sessionsTable.grantReadWriteData(backend.authFunction.resources.lambda);
 loginAttemptsTable.grantReadWriteData(backend.authFunction.resources.lambda);
 
-/* The base URL shows up in the stack outputs and in amplify_outputs.json for the frontend */
+/* The API URL goes to the stack outputs and amplify_outputs.json */
 new CfnOutput(apiStack, "AuthApiUrl", { value: httpApi.apiEndpoint });
 backend.addOutput({
   custom: {

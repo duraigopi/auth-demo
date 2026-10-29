@@ -53,7 +53,7 @@ export const authMiddleware = async (c: Context<AuthEnv>, next: Next) => {
   const userId = String(payload.sub);
   const sessionId = String(payload.sid);
 
-  /* The token alone stays valid until it expires, so the user and the session are checked on every request. Disabling, demoting or logging out then takes effect at once. */
+  /* Check the user and session on every request so disabling or logout works right away */
   const [{ data: session }, { data: user }] = await Promise.all([
     SessionEntity
       .get({ session_id: sessionId })

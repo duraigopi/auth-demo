@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { showApiErrorToast, showSuccessToast } from "@shared/utils/notifications";
 import type { ApiResponse, PaginationMeta } from "@shared/types/api";
 
-/* What the query cache stores after a successful fetch */
+/* Shape of the cached query data */
 interface QueryCacheData<T> {
   data: T;
   count?: number;
@@ -35,7 +35,7 @@ export interface UseApiQueryReturn<T> {
   refetch: () => Promise<void>;
 }
 
-/* GET requests: wraps useQuery, treats an unsuccessful ApiResponse as an error, and shows a toast for it */
+/* GET hook, shows a toast when the response fails */
 export const useApiQuery = <T,>({
   queryKey,
   queryFn,
@@ -54,7 +54,7 @@ export const useApiQuery = <T,>({
 
       if (!response.success) {
         if (shouldShowErrorToast) showApiErrorToast(response, "Failed to Load Data");
-        /* The whole response is thrown, so callers can read validation_errors */
+        /* Throw the whole response so callers can read validation_errors */
         throw response;
       }
 
@@ -108,7 +108,7 @@ export interface UseApiMutationReturn<TData, TVariables> {
   reset: () => void;
 }
 
-/* POST, PUT and DELETE requests: wraps useMutation, with toasts and a refresh of the listed queries after a success */
+/* POST, PUT and DELETE hook, refreshes the given queries on success */
 export const useApiMutation = <TData, TVariables>({
   mutationKey,
   mutationFn,
@@ -132,7 +132,7 @@ export const useApiMutation = <TData, TVariables>({
         throw response;
       }
 
-      /* Some endpoints, such as logout, return only a message, so data can be undefined */
+      /* Some endpoints only return a message, so data can be undefined */
       return response.data as TData;
     },
     onSuccess: (data) => {

@@ -4,20 +4,20 @@
 import type { ReactNode } from "react";
 import { Button, CloseButton, Dialog, Portal, Show, Text } from "@chakra-ui/react";
 
-/* Props of the confirmation popup, which asks the user to confirm before an action runs */
+/* Props for the confirmation dialog */
 export interface ConfirmationDialogProps {
   title: string;
   description?: ReactNode;
-  /* Extra content under the description, such as form fields */
+  /* Extra content such as form fields */
   children?: ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   confirmLabel?: string;
   cancelLabel?: string;
-  /* danger makes the confirm button red, for actions that remove or block something */
+  /* danger gives a red confirm button */
   tone?: "primary" | "danger";
-  /* Disables the buttons while the request is running */
+  /* Disables the buttons during the request */
   isLoading?: boolean;
 }
 

@@ -7,7 +7,7 @@ import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 /* Shared module imports */
 import { SelectField } from "@shared/components/select-field";
 
-/* Props of the pagination bar used under list tables */
+/* Props for the pagination bar */
 export interface PaginationBarProps {
   page: number;
   pageSize: number;
@@ -45,7 +45,7 @@ export const PaginationBar = ({ page, pageSize, count, onPageChange, onPageSizeC
           </Flex>
         </Flex>
 
-        {/* Nothing to navigate when everything fits on one page */}
+        {/* No page buttons when there is only one page */}
         <Show when={count > pageSize}>
           <ButtonGroup attached size="sm">
             <Pagination.PrevTrigger asChild>

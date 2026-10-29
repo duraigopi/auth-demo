@@ -1,10 +1,10 @@
-/* One field that failed validation on the server */
+/* A field error from server validation */
 export interface PayloadValidationError {
   field: string;
   message: string;
 }
 
-/* Page info returned by list endpoints */
+/* Pagination info from list endpoints */
 export interface PaginationMeta {
   page: number;
   limit: number;
@@ -12,7 +12,7 @@ export interface PaginationMeta {
   total_pages: number;
 }
 
-/* Response body used by every API endpoint */
+/* Response body for every endpoint */
 export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
@@ -24,7 +24,7 @@ export interface ApiResponse<T = unknown> {
   timestamp: string;
 }
 
-/* The two tokens returned by login and refresh */
+/* Tokens returned by login and refresh */
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;

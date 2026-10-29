@@ -21,7 +21,7 @@ export const createAccessToken = ({ userId, role, sessionId }: {
   exp: addMinutesToUnixTimestamp(AUTH_CONFIG.ACCESS_TOKEN_MINUTES),
 }, JWT_SECRET);
 
-/* Refresh token, jti must match the session's refresh_token so each refresh invalidates the previous one */
+/* Refresh token, jti must match the session so each refresh replaces the last */
 export const createRefreshToken = ({ userId, sessionId, tokenId }: {
   userId: string;
   sessionId: string;

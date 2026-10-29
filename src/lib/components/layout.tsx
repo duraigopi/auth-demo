@@ -2,7 +2,7 @@
 import type { ReactNode } from "react";
 import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 
-/* Props for the centered card shared by every auth page */
+/* Props for the auth page card layout */
 export interface AuthLayoutProps {
   title: string;
   subtitle: string;

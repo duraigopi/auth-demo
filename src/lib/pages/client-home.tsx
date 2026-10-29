@@ -10,7 +10,7 @@ import type { UserResponse } from "@lib/types/auth";
 /* Shared module imports */
 import { formatDisplayDate } from "@shared/utils/time";
 
-/* Props of the page a client user sees after logging in */
+/* Props for the client home page */
 export interface ClientHomePageProps {
   user: UserResponse | null;
 }

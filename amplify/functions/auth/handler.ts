@@ -66,7 +66,7 @@ app.use("*", bodyLimit({
   },
 }));
 
-/* Rate limit per caller, keyed on the source IP from the Lambda event. x-forwarded-for isn't used because the caller controls it */
+/* Rate limit by source IP from the Lambda event, x-forwarded-for can be faked */
 app.use("*", rateLimiter({
   windowMs: RATE_LIMIT.WINDOW_MS,
   limit: RATE_LIMIT.MAX_REQUESTS,

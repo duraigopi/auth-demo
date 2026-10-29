@@ -1,7 +1,7 @@
 /* Library imports */
 import { z } from "zod/v4";
 
-/* A calendar day as YYYY-MM-DD, used for the created-at range filter */
+/* A day as YYYY-MM-DD, used for the created date filter */
 const dayField = z.iso.date({ error: "Please provide a date as YYYY-MM-DD" });
 
 export const listQuerySchema = z.object({

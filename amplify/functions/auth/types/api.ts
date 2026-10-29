@@ -30,7 +30,7 @@ export interface ApiResponse<T = unknown> {
   timestamp: string;
 }
 
-/* Handler context after the JSON body is validated, used by the public handlers (signup, login, refresh) */
+/* Context with a validated JSON body, used by signup, login and refresh */
 export type ValidatedJsonContext<T> = Context<Env, string, { out: { json: T } }>;
 
 /* Hono env for routes behind authMiddleware, it gives handlers c.var.auth */
@@ -40,5 +40,5 @@ export interface AuthEnv extends Env {
   };
 }
 
-/* Handler context behind authMiddleware plus the validated request parts, e.g. AuthValidatedContext<{ param: UserIdParam }> */
+/* Context behind authMiddleware plus validated request parts */
 export type AuthValidatedContext<Out extends object> = Context<AuthEnv, string, { out: Out }>;

@@ -19,7 +19,7 @@ import { PasswordField } from "@shared/components/password-field";
 import { TextField } from "@shared/components/text-field";
 import { useApiMutation } from "@shared/hooks/use-api-query";
 
-/* Props of the profile popup opened from the header avatar */
+/* Props for the profile dialog */
 export interface ProfileDialogProps {
   user: UserResponse | null;
   open: boolean;
@@ -44,7 +44,7 @@ export const ProfileDialog = ({ user, open, onOpenChange, onLogout }: ProfileDia
     },
   });
 
-  /* Start from the saved name each time the popup opens */
+  /* Load the saved name when the dialog opens */
   useEffect(() => {
     if (open && user) profileForm.reset({ name: user.name });
   }, [open, user, profileForm]);

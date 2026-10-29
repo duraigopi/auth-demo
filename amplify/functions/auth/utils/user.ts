@@ -1,7 +1,7 @@
 /* Backend module imports */
 import type { PublicUser } from "@backend/types/auth";
 
-/* Explicit list of returned fields, so new attributes aren't exposed by accident */
+/* Only return these fields so new attributes don't leak */
 export const toPublicUser = (user: PublicUser): PublicUser => ({
   user_id: user.user_id,
   email: user.email,

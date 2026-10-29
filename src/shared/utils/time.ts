@@ -1,7 +1,7 @@
 /* Library imports */
 import { format, parseISO } from "date-fns";
 
-/* Formats an ISO timestamp as dd-Mon-yyyy (e.g. "16-Jan-2026"); returns the fallback when it is empty or invalid */
+/* Format an ISO date as dd-MMM-yyyy */
 export const formatDisplayDate = (isoString: string | undefined | null, fallback = "-") => {
   if (!isoString) return fallback;
   const date = parseISO(isoString);
@@ -9,7 +9,7 @@ export const formatDisplayDate = (isoString: string | undefined | null, fallback
   return format(date, "dd-MMM-yyyy");
 };
 
-/* Same as formatDisplayDate, plus the time as HH:mm (e.g. "16-Jan-2026, 10:30") */
+/* Same as above with the time */
 export const formatDisplayDateTime = (isoString: string | undefined | null, fallback = "-") => {
   if (!isoString) return fallback;
   const date = parseISO(isoString);

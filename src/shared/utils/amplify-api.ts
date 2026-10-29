@@ -8,7 +8,7 @@ import { AUTH_ENDPOINTS } from "@shared/api/endpoints";
 import type { ApiResponse, AuthTokens } from "@shared/types/api";
 import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from "@shared/utils/token-storage";
 
-/* Points Amplify's REST client at the deployed API; the endpoint comes from the backend's outputs file */
+/* Point Amplify at the API from the outputs file */
 const configureAmplify = () => {
   Amplify.configure({
     ...outputs,
@@ -18,27 +18,27 @@ const configureAmplify = () => {
   });
 };
 
-/* Options for every wrapper; unauth is for the public routes (login, signup) */
+/* Request options, unauth skips the token for public routes */
 interface AmplifyApiOptions {
   path: string;
   queryParams?: Record<string, string>;
   unauth?: boolean;
 }
 
-/* Same as above, plus the JSON body for POST and PUT */
+/* Adds the JSON body for POST and PUT */
 interface AmplifyBodyOptions extends AmplifyApiOptions {
   body?: unknown;
 }
 
 type AmplifyBody = NonNullable<NonNullable<Parameters<typeof post>[0]["options"]>["body"]>;
 
-/* Amplify throws on non-2xx, so read the server's body from the error; anything else is a network failure */
+/* Amplify throws on non-2xx, so read the body from the error */
 const errorToApiResponse = (error: unknown): ApiResponse<never> => {
   if (error instanceof ApiError && error.response?.body) {
     try {
       return JSON.parse(error.response.body) as ApiResponse<never>;
     } catch {
-      /* Not JSON, so use the generic message */
+      /* Not JSON, fall back to the generic message */
     }
   }
 
@@ -50,7 +50,7 @@ const errorToApiResponse = (error: unknown): ApiResponse<never> => {
   };
 };
 
-/* Only one refresh runs at a time, because the server rotates the refresh token */
+/* One refresh at a time, since the server rotates the token */
 let refreshPromise: Promise<boolean> | null = null;
 
 const refreshTokens = () => {
@@ -79,7 +79,7 @@ const refreshTokens = () => {
   return refreshPromise;
 };
 
-/* Runs a request with the access token; on a 401 it refreshes the tokens once and runs it again */
+/* Retry once with refreshed tokens on a 401 */
 const withAuthRetry = async <R>(perform: (token: string | null) => Promise<R>, unauth = false): Promise<R> => {
   if (unauth) return perform(null);
 
@@ -91,7 +91,7 @@ const withAuthRetry = async <R>(perform: (token: string | null) => Promise<R>, u
     if (await refreshTokens()) return perform(getAccessToken());
 
     clearTokens();
-    /* No router outside components, and the full reload also drops any cached user data */
+    /* No router here, so do a full page reload */
     /* eslint-disable-next-line @next/next/no-location-assign-relative-destination */
     window.location.href = "/auth/login";
     throw error;
@@ -107,7 +107,7 @@ export const amplifyGet = async <T = unknown>(options: AmplifyApiOptions): Promi
       const { body } = await get({
         apiName: "api",
         path,
-        /* Auth is the bearer header, so skip Amplify's own credential lookup */
+        /* We send the token ourselves, skip Amplify's credentials */
         options: { queryParams, headers: { ...(token && { Authorization: `Bearer ${token}` }) }, defaultAuthMode: "none" },
       }).response;
       return (await body.json()) as unknown as ApiResponse<T>;

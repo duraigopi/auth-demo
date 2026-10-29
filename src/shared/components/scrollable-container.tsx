@@ -5,12 +5,12 @@ import type { ReactNode } from "react";
 import { ScrollArea, Show } from "@chakra-ui/react";
 import type { ScrollAreaRootProps } from "@chakra-ui/react";
 
-/* Props of the scrollable container, which wraps Chakra's ScrollArea with the app's scrollbar look */
+/* Props for the scroll container, wraps Chakra ScrollArea */
 export interface ScrollableContainerProps extends ScrollAreaRootProps {
   children: ReactNode;
-  /* Scroll direction; vertical is the default */
+  /* Defaults to vertical */
   orientation?: "vertical" | "horizontal" | "both";
-  /* Scrolling still works, but no scrollbar is drawn */
+  /* Hide the scrollbar but keep scrolling */
   hideScrollbar?: boolean;
 }
 
@@ -22,7 +22,7 @@ export const ScrollableContainer = ({
 }: ScrollableContainerProps) => (
   <ScrollArea.Root w="100%" {...rootProps}>
     <ScrollArea.Viewport>
-      {/* A vertical area must not grow wider than its parent, because the content sets min-width inline */}
+      {/* Keeps vertical areas from getting wider than the parent */}
       <ScrollArea.Content css={orientation === "vertical" ? { minWidth: "0 !important" } : undefined}>
         {children}
       </ScrollArea.Content>

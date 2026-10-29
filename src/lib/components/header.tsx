@@ -17,7 +17,7 @@ import type { UserResponse } from "@lib/types/auth";
 import { useApiQuery } from "@shared/hooks/use-api-query";
 import { clearTokens } from "@shared/utils/token-storage";
 
-/* Top bar for the signed-in pages: the app name and the profile avatar, which opens the profile popup */
+/* Top bar with the app name and the profile avatar */
 export const Header = () => {
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -27,7 +27,7 @@ export const Header = () => {
   });
 
   const onLogout = async () => {
-    /* The tokens are cleared even if the API call fails, so the user is always logged out here */
+    /* Clear the tokens even if the logout call fails */
     await logoutApi();
     clearTokens();
     router.push("/auth/login");

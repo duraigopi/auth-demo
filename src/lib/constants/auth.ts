@@ -1,7 +1,7 @@
 /* Lib module imports */
 import type { UserRole } from "@lib/types/auth";
 
-/* Account roles; the API sends and expects these exact values */
+/* User roles, same values as the API */
 export const USER_ROLES = {
   ADMIN: "ADMIN",
   CLIENT: "CLIENT",

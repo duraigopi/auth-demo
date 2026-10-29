@@ -12,7 +12,7 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
   const { page, limit, search, role, is_active, from, to } = c.req.valid("query");
 
   try {
-    /* Scans the whole table and filters in memory, fine for a small list */
+    /* Scan the whole table and filter in memory, fine for a small list */
     const { data: users } = await UserEntity
       .scan
       .go({
@@ -20,7 +20,7 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
         attributes: ["user_id", "email", "name", "role", "is_active", "created_at"],
       });
 
-    /* Search matches the name or the email (emails are stored lowercase) */
+    /* Search by name or email, emails are stored lowercase */
     const searchTerm = search?.toLowerCase();
     const filteredUsers = users.filter((user) => {
       if (role && user.role !== role) return false;
@@ -30,7 +30,7 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
       return true;
     });
 
-    /* Cut out the requested page */
+    /* Take the requested page */
     const offset = (page - 1) * limit;
     const total = filteredUsers.length;
     const pageRows = filteredUsers.slice(offset, offset + limit);
