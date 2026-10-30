@@ -16,7 +16,7 @@ export const signup = async (c: ValidatedJsonContext<SignupFormData>) => {
   const { name, email, password } = c.req.valid("json");
 
   try {
-    /* Reject an email that already has an account (not atomic: concurrent signups could both pass) */
+    /* Reject an email that already has an account */
     const { data: existing } = await UserEntity
       .query.byEmail({ email })
       .go({

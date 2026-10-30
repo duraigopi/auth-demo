@@ -29,7 +29,7 @@ export const REQUEST_LIMITS = {
   MAX_BODY_SIZE_KB: 100,
 } as const;
 
-/* Counters live in memory per Lambda container, so this is only a per-instance limit */
+/* Requests allowed from one source IP in each window */
 export const RATE_LIMIT = {
   WINDOW_MS: 60 * 1000,
   MAX_REQUESTS: 120,

@@ -14,7 +14,7 @@ export const create = async (c: AuthValidatedContext<{ json: CreateUserFormData 
   const { name, email, password, role } = c.req.valid("json");
 
   try {
-    /* Not atomic: two concurrent requests with the same email could both pass this check */
+    /* Reject an email that already has an account */
     const { data: existing } = await UserEntity
       .query.byEmail({ email })
       .go({ attributes: ["user_id"] });

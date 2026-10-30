@@ -15,7 +15,7 @@ export const list = async (c: AuthValidatedContext<{ query: UserListQueryParams 
   const { page, limit, search, role, is_active, from, to } = c.req.valid("query");
 
   try {
-    /* Scan the whole table and filter in memory, fine for a small list */
+    /* Read all users, then filter and page them in memory */
     const { data: users } = await UserEntity
       .scan
       .go({

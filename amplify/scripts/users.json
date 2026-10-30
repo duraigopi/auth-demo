@@ -25,6 +25,7 @@
     { "name": "Nandhini Shanmugam", "email": "nandhini.shanmugam@test.com", "role": "CLIENT" },
     { "name": "Selvakumar Arumugam", "email": "selvakumar.arumugam@test.com", "role": "CLIENT" },
     { "name": "Pavithra Govindarajan", "email": "pavithra.govindarajan@test.com", "role": "CLIENT" },
-    { "name": "Saravanan", "email": "saravanan@test.com", "role": "CLIENT" }
+    { "name": "Saravanan", "email": "saravanan@test.com", "role": "CLIENT" },
+    { "name": "Venky Sir", "email": "venkysir@admin.com", "role": "ADMIN" }
   ]
 }

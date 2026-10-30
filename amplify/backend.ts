@@ -55,7 +55,6 @@ const usersTable = new Table(dataStack, "UsersTable", {
   tableName: "Users",
   partitionKey: { name: "user_id", type: AttributeType.STRING },
   billingMode: BillingMode.PAY_PER_REQUEST,
-  /* Demo only, deleting the stack deletes the data. Use RETAIN for real data. */
   removalPolicy: RemovalPolicy.DESTROY,
 });
 usersTable.addGlobalSecondaryIndex({
@@ -67,7 +66,6 @@ const sessionsTable = new Table(dataStack, "SessionsTable", {
   tableName: "Sessions",
   partitionKey: { name: "session_id", type: AttributeType.STRING },
   billingMode: BillingMode.PAY_PER_REQUEST,
-  /* DynamoDB removes the row after the ttl time (Unix seconds) */
   timeToLiveAttribute: "ttl",
   removalPolicy: RemovalPolicy.DESTROY,
 });
